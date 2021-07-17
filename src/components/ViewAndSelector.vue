@@ -53,6 +53,7 @@
 <script>
 import 'viewerjs/dist/viewer.css'
 import {directive as viewer} from "v-viewer"
+import axios from "axios";
 
 export default {
     name: "ViewAndSelector",
@@ -60,6 +61,10 @@ export default {
         viewer: viewer({
             debug: true,
         }),
+    },
+    mounted() {
+        this.url = this.$store.state.server_url
+        this.fetchData()
     },
     data() {
         return {
@@ -100,12 +105,19 @@ export default {
                 height: '30px',
                 lineHeight: '30px',
             },
+            url: ""
         };
     },
     methods: {
         show() {
             const viewer = this.$el.querySelector('.images').$viewer
             viewer.show()
+        },
+        async fetchData() {
+            let batch_list_url = this.url + "/api/batch_list";
+            await axios.get("/api/batch_list").then((res) => {
+                console.log(res.data)
+            });
         }
     }
 }
