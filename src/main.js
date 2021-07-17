@@ -5,17 +5,18 @@ import store from './store'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import axios from "axios";
-// import vuescroll from 'vuescroll';
+import vuescroll from 'vuescroll';
 
 Vue.config.productionTip = false
 
 Vue.use(Antd)
+Vue.use(vuescroll);
 
-// Vue.prototype.$vuescrollConfig = {
-//   bar: {
-//     background: '#8c8686'
-//   }
-// };
+Vue.prototype.$vuescrollConfig = {
+    bar: {
+        background: '#8c8686'
+    }
+};
 
 axios.defaults.baseURL = "/api"
 
