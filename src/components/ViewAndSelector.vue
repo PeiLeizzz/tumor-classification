@@ -3,15 +3,15 @@
         <div>
             <a-row>
                 <h3 align="center">当前选择图片: {{ received_data.pic_name[currentPictureIdx] }}</h3>
-                <p align="end" style="margin: 0">当前已标记 {{ currentPictureIdx }}/{{ received_data.pic_name.length }}</p>
+                <p align="end" style="margin: 0">当前已标记 {{ current_count }}/{{ received_data.pic_name.length }}</p>
             </a-row>
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
                 <a-col span="5">
                     <vue-scroll>
                         <div style="height: 550px">
-                            <div v-for="(item,index) in this.received_data.pic_name">
-                                <div style="display: flex;justify-content:space-between;align-content: center;height: 30px">
+                            <div v-for="(item,index) in this.received_data.pic_name" :key="item">
+                                <div :class="currentPictureIdx === index ? 'left-col-items-selected':'left-col-items'" @click="changeImageIdx(index)">
                                     {{ item }}
                                     <div>
                                         <!-- 控制√的颜色 -->
@@ -31,11 +31,11 @@
                         </a-col>
                     </a-row>
                     <a-button-group style="display:flex;justify-content:space-around;margin-top:30px;">
-                        <a-button type="primary">
+                        <a-button type="primary" @click="prevImageIdx">
                             <a-icon type="left"/>
                             上一张
                         </a-button>
-                        <a-button type="primary">
+                        <a-button type="primary" @click="nextImageIdx">
                             下一张
                             <a-icon type="right"/>
                         </a-button>
@@ -43,14 +43,33 @@
                 </a-col>
                 <!--   类别判断   -->
                 <a-col span="5">
+                    <!--                    <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">-->
+                    <!--                        <a-radio-group size="large" @change="updateClassInfo">-->
+                    <!--                            <a-space direction="vertical">-->
+                    <!--                                <div v-for="subClass in classes" :key="subClass">-->
+                    <!--                                    <a-radio-button v-if="current_class===subClass" :value="subClass"-->
+                    <!--                                                    :style="radioStyleSelect">-->
+                    <!--                                        {{ subClass }}{{ subClass === current_class }}-->
+                    <!--                                    </a-radio-button>-->
+                    <!--                                    <a-radio-button v-else :value="subClass"-->
+                    <!--                                                    :style="radioStyle">-->
+                    <!--                                        {{ subClass }}-->
+                    <!--                                    </a-radio-button>-->
+                    <!--                                </div>-->
+                    <!--                            </a-space>-->
+                    <!--                        </a-radio-group>-->
+                    <!--                    </div>-->
                     <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">
-                        <a-radio-group default-value="a" size="large" @change="updateClassInfo">
-                            <a-space direction="vertical">
-                                <a-radio-button v-for="subClass in classes" :value="subClass" :style="radioStyle">
+                        <a-space direction="vertical">
+                            <div v-for="(subClass) in classes" :key="subClass">
+                                <div class="right-col-items-selected" v-if="current_class===subClass" @click="updateClassInfo(subClass)">
                                     {{ subClass }}
-                                </a-radio-button>
-                            </a-space>
-                        </a-radio-group>
+                                </div>
+                                <div class="right-col-items" v-else @click="updateClassInfo(subClass)">
+                                    {{ subClass }}
+                                </div>
+                            </div>
+                        </a-space>
                     </div>
                 </a-col>
             </a-row>
@@ -75,11 +94,6 @@ export default {
         this.fetchData()
         console.log("data", this.received_data)
     },
-    watch: {
-        // is_classified(newClassify, oldClassify) {
-        //
-        // }
-    },
     data() {
         return {
             currentPictureIdx: -1,
@@ -90,6 +104,8 @@ export default {
                 s_class: [],
                 is_classified: []
             },
+            current_count: 0,
+            current_class: "",
             classes: [
                 "1 胰腺钩突 D2-SMA-SMV",
                 "2 胰腺钩突 D3-SMA-SMV",
@@ -108,7 +124,7 @@ export default {
                 height: '30px',
                 lineHeight: '30px',
             },
-            url: ""
+            url: "",
         };
     },
     methods: {
@@ -148,17 +164,120 @@ export default {
             //默认初始图像下标为0
             this.currentPictureIdx = 0;
         },
-        updateClassInfo(e) {
-            // console.log("eeeeeeee", e.target.value)
-            this.received_data.s_class[this.currentPictureIdx] = e.target.value
-            // this.received_data.is_classified[this.currentPictureIdx] = true
+        updateClassInfo(value) {
+            // this.received_data.s_class[this.currentPictureIdx] = e.target.value
+            this.$set(this.received_data.s_class, this.currentPictureIdx, value)
+            if (!this.received_data.is_classified[this.currentPictureIdx])
+                this.current_count++
             this.$set(this.received_data.is_classified, this.currentPictureIdx, true)
-            console.log("ccccccccccc", this.received_data.is_classified)
-
+            this.refreshSelection()
+            console.log("ssssssss", this.received_data.s_class[this.currentPictureIdx])
+        },
+        changeImageIdx(idx) {
+            this.currentPictureIdx = idx
+            this.refreshSelection()
+            console.log("aaaaaaaaaaaa", this.received_data.s_class)
+        },
+        refreshSelection() {
+            this.current_class = this.received_data.s_class[this.currentPictureIdx]
+            let temp = this.classes
+            this.classes = undefined
+            this.classes = temp
+            console.log("clccss", this.current_class)
+        },
+        prevImageIdx() {
+            if (this.currentPictureIdx === 0) {
+                this.$message.error("这已经是第一张图!")
+            } else {
+                this.currentPictureIdx--;
+                this.refreshSelection()
+            }
+        },
+        nextImageIdx() {
+            if (this.currentPictureIdx === this.received_data.pic_name.length - 1) {
+                this.$message.error("这已经是最后一张图!")
+            } else {
+                this.currentPictureIdx++;
+                this.refreshSelection()
+            }
         }
     }
 }
 </script>
 
 <style scoped>
+.left-col-items {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    line-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 1rem;
+}
+
+.left-col-items-selected {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    line-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 1rem;
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+}
+
+.left-col-items:hover {
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+}
+
+.right-col-items {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    line-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 1rem;
+    /*border-color: #40A9FF;*/
+}
+
+.right-col-items-selected {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    line-height: 30px;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 1rem;
+    border-color: #40A9FF;
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+}
+
+.right-col-items:hover {
+    background-color: gray;
+    color: white;
+    cursor: pointer;
+}
+
+</style>
+
+<style>
+/*.ant-radio-button-checked:nth-child(2) {
+    color: #2c3e50 !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    color: #2c3e50 !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    border-color: #d9d9d9 !important;
+}*/
 </style>
