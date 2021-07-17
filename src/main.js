@@ -9,6 +9,7 @@ import 'ant-design-vue/dist/antd.css'
 Vue.config.productionTip = false
 
 Vue.use(Antd)
+
 // Vue.prototype.$vuescrollConfig = {
 //   bar: {
 //     background: '#8c8686'
@@ -16,7 +17,9 @@ Vue.use(Antd)
 // };
 
 new Vue({
-  router,
-  store,
-  render: function (h) { return h(App) }
+    router,
+    store,
+    render: function (h) {
+        return h(App)
+    }
 }).$mount('#app')
