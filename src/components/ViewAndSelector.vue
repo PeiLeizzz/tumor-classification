@@ -40,25 +40,16 @@
                             <a-icon type="right"/>
                         </a-button>
                     </a-button-group>
+                    <div style="display:flex;justify-content:space-around;margin-top:30px;">
+                        <a-button type="primary" size="large" @click="generatePostData" :disabled="current_count !== received_data.pic_name.length">
+                            提交上传
+                            <a-icon type="upload"/>
+                        </a-button>
+                    </div>
+
                 </a-col>
                 <!--   类别判断   -->
                 <a-col span="5">
-                    <!--                    <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">-->
-                    <!--                        <a-radio-group size="large" @change="updateClassInfo">-->
-                    <!--                            <a-space direction="vertical">-->
-                    <!--                                <div v-for="subClass in classes" :key="subClass">-->
-                    <!--                                    <a-radio-button v-if="current_class===subClass" :value="subClass"-->
-                    <!--                                                    :style="radioStyleSelect">-->
-                    <!--                                        {{ subClass }}{{ subClass === current_class }}-->
-                    <!--                                    </a-radio-button>-->
-                    <!--                                    <a-radio-button v-else :value="subClass"-->
-                    <!--                                                    :style="radioStyle">-->
-                    <!--                                        {{ subClass }}-->
-                    <!--                                    </a-radio-button>-->
-                    <!--                                </div>-->
-                    <!--                            </a-space>-->
-                    <!--                        </a-radio-group>-->
-                    <!--                    </div>-->
                     <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">
                         <a-space direction="vertical">
                             <div v-for="(subClass) in classes" :key="subClass">
@@ -93,19 +84,30 @@ export default {
         this.url = this.$store.state.server_url
         this.fetchData()
         console.log("data", this.received_data)
+        //设置起始时间
+        this.post_data.start_time = new Date().getTime();
     },
     data() {
         return {
             currentPictureIdx: -1,
             is_classified: [],
+            // 接收数据
             received_data: {
                 pic_url: [],
                 pic_name: [],
                 s_class: [],
                 is_classified: []
             },
+            // 上传数据
+            post_data: {
+                batch_id: "",
+                start_time: "",
+                end_time: "",
+                results: []
+            },
             current_count: 0,
             current_class: "",
+            // 分类类别
             classes: [
                 "1 胰腺钩突 D2-SMA-SMV",
                 "2 胰腺钩突 D3-SMA-SMV",
@@ -119,11 +121,6 @@ export default {
                 "10 胰腺钩突 D3-SMA-SMV",
                 "11 胰腺钩突 D4-SMA-SMV",
             ],
-            radioStyle: {
-                display: 'block',
-                height: '30px',
-                lineHeight: '30px',
-            },
             url: "",
         };
     },
@@ -143,14 +140,38 @@ export default {
             console.log(unlabeledList.length)
             //随机获得一个unlabeled的batch
             let ids = Math.floor(Math.random() * unlabeledList.length);
+            //填写batch_id
+            this.post_data.batch_id = unlabeledList[ids]
             await axios.get("/api/img_list/" + unlabeledList[ids]).then((res) => {
                 console.log(res.data)
                 //将获得的图像列表付给received_data
+                // this.received_data.pic_name = res.data["img_list"].slice(0, 10) // 测试前10组样例
                 this.received_data.pic_name = res.data["img_list"]
                 this.generateImgUrl()
             }).catch((e) => {
                 this.$message.error(e);
             });
+        },
+        // 上传数据
+        async postData() {
+            // 填入完成时间戳
+            this.post_data.end_time = new Date().getTime()
+            await axios.post("/post_info", this.post_data).then((res) => {
+                console.log("dddddddddddddddd", res.data)
+            }).catch((e) => {
+                this.$message.error(e);
+            });
+        },
+        generatePostData() {
+            for (let i = 0; i < this.received_data.pic_name.length; i++) {
+                let obj = {
+                    img_name: this.received_data.pic_name[i],
+                    img_class: this.received_data.s_class[i]
+                }
+                this.post_data.results.push(obj)
+            }
+            // console.log("objjjjjjjj", this.post_data)
+            this.postData();
         },
         // 生成图像对应链接以及将isClassified置为false
         generateImgUrl() {
@@ -171,23 +192,20 @@ export default {
                 this.current_count++
             this.$set(this.received_data.is_classified, this.currentPictureIdx, true)
             this.refreshSelection()
-            console.log("ssssssss", this.received_data.s_class[this.currentPictureIdx])
         },
         changeImageIdx(idx) {
             this.currentPictureIdx = idx
             this.refreshSelection()
-            console.log("aaaaaaaaaaaa", this.received_data.s_class)
         },
         refreshSelection() {
             this.current_class = this.received_data.s_class[this.currentPictureIdx]
             let temp = this.classes
             this.classes = undefined
             this.classes = temp
-            console.log("clccss", this.current_class)
         },
         prevImageIdx() {
             if (this.currentPictureIdx === 0) {
-                this.$message.error("这已经是第一张图!")
+                this.$message.warning("这已经是第一张图!")
             } else {
                 this.currentPictureIdx--;
                 this.refreshSelection()
@@ -195,7 +213,7 @@ export default {
         },
         nextImageIdx() {
             if (this.currentPictureIdx === this.received_data.pic_name.length - 1) {
-                this.$message.error("这已经是最后一张图!")
+                this.$message.warning("这已经是最后一张图!")
             } else {
                 this.currentPictureIdx++;
                 this.refreshSelection()
