@@ -25,6 +25,7 @@ Vue.prototype.$vuescrollConfig = {
 };
 
 axios.defaults.baseURL = "/api"
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 new Vue({
     router,

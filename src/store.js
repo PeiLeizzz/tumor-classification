@@ -5,8 +5,14 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        server_url: "http://120.55.48.190:8000"
+        server_url: "http://120.55.48.190:8000",
+        batch_list: []
     },
-    mutations: {},
+    mutations: {
+        setBatchList(value) {
+            this.batch_list = []
+            this.batch_list = value
+        }
+    },
     actions: {}
 })

@@ -137,6 +137,7 @@ export default {
             let data = undefined
             await axios.get("/api/batch_list").then((res) => {
                 // console.log(res.data)
+                this.$store.commit("setBatchList", res.data)
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有图像已经被标记完毕！");
                 } else
@@ -156,7 +157,7 @@ export default {
             await axios.get("/api/img_list/" + unlabeledList[ids]).then((res) => {
                 console.log(res.data)
                 //将获得的图像列表付给received_data
-                // this.received_data.pic_name = res.data["img_list"].slice(0, 5) // 测试前10组样例
+                // this.received_data.pic_name = res.data["img_list"].slice(0, 5) // 测试前5组样例
                 this.received_data.pic_name = res.data["img_list"]
                 this.generateImgUrl()
             }).catch((e) => {
