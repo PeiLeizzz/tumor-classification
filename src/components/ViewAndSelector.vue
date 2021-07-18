@@ -7,9 +7,9 @@
             </a-row>
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
-                <a-col :sm="6" :md="6" :lg="7" :xl="6" :xxl="5">
+                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5">
                     <vue-scroll>
-                        <div style="height: 550px;display:flex;justify-content: center;align-items: center;flex-flow: column">
+                        <div style="height: 550px;display:flex;align-items: center;flex-flow: column">
                             <div v-for="(item,index) in this.received_data.pic_name" :key="item" style="width: 80%">
                                 <div :class="currentPictureIdx === index ? 'left-col-items-selected':'left-col-items'" @click="changeImageIdx(index)">
                                     {{ item }}
@@ -24,9 +24,9 @@
                     </vue-scroll>
                 </a-col>
                 <!--   图片展示   -->
-                <a-col :sm="6" :md="8" :lg="10" :xl="11" :xxl="14">
+                <a-col :sm="14" :md="14" :lg="14" :xl="14" :xxl="14">
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
-                        <a-col style="width: 640px;height: 360px ;display:flex;justify-content:center;align-content: center">
+                        <a-col style="width: 768px;height: 432px ;display:flex;justify-content:center;align-content: center">
                             <img v-lazy="this.received_data.pic_url[this.currentPictureIdx]" alt="" style="max-height: 100%;max-width: 100%">
                         </a-col>
                     </a-row>
@@ -49,7 +49,7 @@
                     </div>
                 </a-col>
                 <!--   类别判断   -->
-                <a-col :sm="10" :md="10" :lg="7" :xl="7" :xxl="5">
+                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5">
                     <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">
                         <a-space direction="vertical">
                             <div v-for="(subClass) in classes" :key="subClass">
@@ -128,8 +128,6 @@ export default {
     methods: {
         async fetchClasses() {
             await axios.get("/api/class_list").then((res) => {
-                // console.log(res.data)
-                // data = res.data["unlabled"]
                 this.classes = res.data["classes"]
             }).catch((e) => {
                 this.$message.error(e);
