@@ -23,6 +23,11 @@ export default new Vuex.Store({
 		},
 		$_removeStorage(state, value){  // 删除token
 			localStorage.removeItem('token');
-		}
+		},
+        setBatchList(value) {
+        this.batch_list = []
+        this.batch_list = value
+        }
 	}
+
 })

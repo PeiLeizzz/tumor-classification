@@ -38,6 +38,7 @@ module.exports = {
 
     pwa: {}, // configure webpack-dev-server behavior
     devServer: {
+        disableHostCheck: true,
         proxy: {
             '/api': {
                 //代理api

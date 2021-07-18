@@ -1,22 +1,26 @@
 <template>
     <a-layout id="components-layout-demo-custom-trigger">
         <a-layout-sider v-model="collapsed" :trigger="null" collapsible>
-            <div class="logo"/>
-            <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
-                <a-menu-item key="1">
-                    <a-icon type="file-search"/>
-                    <span style="width: 80%!important;text-align: center;margin-left: 25px">病理识别</span>
-                </a-menu-item>
-                <!-- 后期待开发选项 -->
-                <!--                <a-menu-item key="2">
-                                    <a-icon type="video-camera"/>
-                                    <span>nav 2</span>
-                                </a-menu-item>
-                                <a-menu-item key="3">
-                                    <a-icon type="upload"/>
-                                    <span>nav 3</span>
-                                </a-menu-item>-->
-            </a-menu>
+            <div class="logo" style="display:flex;justify-content:center;align-items: center">
+                <span v-if="!collapsed" style="color: white;font-size: 1.2rem">标注平台</span>
+                <a-icon v-else type="dot-chart" style="color: white;font-size: 1.5rem;"/>
+            </div>
+            <SideMenu></SideMenu>
+            <!--            <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
+                            <a-menu-item key="1">
+                                <a-icon type="file-search"/>
+                                <span style="width: 80%!important;text-align: center;margin-left: 25px">病理识别</span>
+                            </a-menu-item>
+                            &lt;!&ndash; 后期待开发选项 &ndash;&gt;
+                            &lt;!&ndash;                <a-menu-item key="2">
+                                                <a-icon type="video-camera"/>
+                                                <span>nav 2</span>
+                                            </a-menu-item>
+                                            <a-menu-item key="3">
+                                                <a-icon type="upload"/>
+                                                <span>nav 3</span>
+                                            </a-menu-item>&ndash;&gt;
+                        </a-menu>-->
         </a-layout-sider>
         <a-layout>
             <a-layout-header style="background: #fff; padding: 0">
@@ -28,18 +32,21 @@
             </a-layout-header>
             <a-layout-content :style="{ margin: '16px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
                 <!-- 病理诊断界面 -->
-                <ViewAndSelector></ViewAndSelector>
+                <vue-scroll>
+                    <ViewAndSelector></ViewAndSelector>
+                </vue-scroll>
             </a-layout-content>
         </a-layout>
     </a-layout>
 </template>
 <script>
 import ViewAndSelector from '@/components/ViewAndSelector'
+import SideMenu from "@/components/SideMenu";
 
 export default {
     name: "MainPage",
     components: {
-        ViewAndSelector
+        ViewAndSelector, SideMenu
     },
     data() {
         return {

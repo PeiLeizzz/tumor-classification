@@ -7,10 +7,10 @@
             </a-row>
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
-                <a-col span="5">
+                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5">
                     <vue-scroll>
-                        <div style="height: 550px">
-                            <div v-for="(item,index) in this.received_data.pic_name" :key="item">
+                        <div style="height: 550px;display:flex;align-items: center;flex-flow: column">
+                            <div v-for="(item,index) in this.received_data.pic_name" :key="item" style="width: 80%">
                                 <div :class="currentPictureIdx === index ? 'left-col-items-selected':'left-col-items'" @click="changeImageIdx(index)">
                                     {{ item }}
                                     <div>
@@ -24,9 +24,9 @@
                     </vue-scroll>
                 </a-col>
                 <!--   图片展示   -->
-                <a-col span="14">
+                <a-col :sm="14" :md="14" :lg="14" :xl="14" :xxl="14">
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
-                        <a-col style="width: 640px;height: 360px ;display:flex;justify-content:center;align-content: center">
+                        <a-col style="width: 768px;height: 432px ;display:flex;justify-content:center;align-content: center">
                             <img v-lazy="img_src" alt="" style="max-height: 100%;max-width: 100%">
                         </a-col>
                     </a-row>
@@ -47,10 +47,9 @@
                             <a-icon type="upload"/>
                         </a-button>
                     </div>
-
                 </a-col>
                 <!--   类别判断   -->
-                <a-col span="5">
+                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5">
                     <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">
                         <a-space direction="vertical">
                             <div v-for="(subClass) in classes" :key="subClass">
@@ -130,8 +129,6 @@ export default {
     methods: {
         async fetchClasses() {
             await axios.get("/api/class_list").then((res) => {
-                // console.log(res.data)
-                // data = res.data["unlabled"]
                 this.classes = res.data["classes"]
             }).catch((e) => {
                 this.$message.error(e);
@@ -141,6 +138,7 @@ export default {
             let data = undefined
             await axios.get("/api/batch_list").then((res) => {
                 // console.log(res.data)
+                this.$store.commit("setBatchList", res.data)
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有图像已经被标记完毕！");
                 } else
@@ -160,8 +158,8 @@ export default {
             await axios.get("/api/img_list/" + unlabeledList[ids]).then((res) => {
                 console.log(res.data)
                 //将获得的图像列表付给received_data
-                this.received_data.pic_name = res.data["img_list"].slice(0, 5) // 测试前10组样例
-                // this.received_data.pic_name = res.data["img_list"]
+                // this.received_data.pic_name = res.data["img_list"].slice(0, 5) // 测试前5组样例
+                this.received_data.pic_name = res.data["img_list"]
                 this.generateImgUrl()
             }).catch((e) => {
                 this.$message.error(e);
@@ -172,7 +170,6 @@ export default {
             // 填入完成时间戳
             this.post_data.end_time = new Date().getTime()
             await axios.post("/post_info", this.post_data).then((res) => {
-                console.log("dddddddddddddddd", res.data)
                 this.uploading = false
                 this.upload_status = 1
                 let _this = this
