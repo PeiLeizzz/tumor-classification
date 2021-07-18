@@ -27,7 +27,7 @@
                 <a-col span="14">
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
                         <a-col style="width: 640px;height: 360px ;display:flex;justify-content:center;align-content: center">
-                            <img v-lazy="this.received_data.pic_url[this.currentPictureIdx]" alt="" style="max-height: 100%;max-width: 100%">
+                            <img v-lazy="img_src" alt="" style="max-height: 100%;max-width: 100%">
                         </a-col>
                     </a-row>
                     <a-button-group style="display:flex;justify-content:space-around;margin-top:30px;">
@@ -124,6 +124,7 @@ export default {
             // 分类类别
             classes: [],
             url: "",
+						img_src: ""
         };
     },
     methods: {
@@ -240,7 +241,23 @@ export default {
                 this.refreshSelection()
             }
         }
-    }
+    },
+		watch: {
+			currentPictureIdx() {
+				axios.get('/api/img/' + this.received_data.pic_name[this.currentPictureIdx], {
+					responseType: "arraybuffer"
+				}).then((res) => {
+					console.log(res)
+					return 'data:image/png;base64,' + btoa(
+										new Uint8Array(res.data)
+										.reduce((data, byte) => data + String.fromCharCode(byte), '')
+									);
+				}).then((data) => {
+					console.log(data)
+					this.img_src = data;
+				});
+			}
+		}
 }
 </script>
 
