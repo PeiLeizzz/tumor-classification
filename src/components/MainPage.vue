@@ -28,7 +28,9 @@
             </a-layout-header>
             <a-layout-content :style="{ margin: '16px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
                 <!-- 病理诊断界面 -->
-                <ViewAndSelector></ViewAndSelector>
+                <vue-scroll>
+                    <ViewAndSelector></ViewAndSelector>
+                </vue-scroll>
             </a-layout-content>
         </a-layout>
     </a-layout>
