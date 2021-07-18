@@ -25,6 +25,30 @@ Vue.prototype.$vuescrollConfig = {
 };
 
 axios.defaults.baseURL = "/api"
+//设置axios为form-data
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.transformRequest = [function (data) {
+    let ret = ''
+    for (let it in data) {
+      ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+    }
+    return ret
+}]
+axios.interceptors.request.use(
+  config => {
+    if (localStorage.getItem('token')) {
+			config.headers.Authorization = 'Bearer ';
+      config.headers.Authorization += localStorage.getItem('token');
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+Vue.prototype.$axios = axios
 
 new Vue({
     router,

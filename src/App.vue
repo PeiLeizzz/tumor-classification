@@ -1,16 +1,12 @@
 <template>
-    <MainPage style="height: 100%"></MainPage>
+	<router-view style="height: 100%"></router-view>
 </template>
 
 <script>
 
-import MainPage from './components/MainPage'
 
 export default {
-    name: 'App',
-    components: {
-        MainPage,
-    },
+    name: 'App'
 }
 </script>
 
