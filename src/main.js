@@ -6,11 +6,17 @@ import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import axios from "axios";
 import vuescroll from 'vuescroll';
+import VueLazyLoad from 'vue-lazyload'
+
 
 Vue.config.productionTip = false
 
 Vue.use(Antd)
 Vue.use(vuescroll);
+Vue.use(VueLazyLoad, {
+    error: '../error.png',
+    loading: '../loading.gif'
+})
 
 Vue.prototype.$vuescrollConfig = {
     bar: {

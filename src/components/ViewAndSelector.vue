@@ -26,8 +26,8 @@
                 <!--   图片展示   -->
                 <a-col span="14">
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
-                        <a-col>
-                            <img :src="this.received_data.pic_url[this.currentPictureIdx]" alt="" width="640" height="360">
+                        <a-col style="width: 640px;height: 360px ;display:flex;justify-content:center;align-content: center">
+                            <img v-lazy="this.received_data.pic_url[this.currentPictureIdx]" alt="" style="max-height: 100%;max-width: 100%">
                         </a-col>
                     </a-row>
                     <a-button-group style="display:flex;justify-content:space-around;margin-top:30px;">
@@ -41,7 +41,8 @@
                         </a-button>
                     </a-button-group>
                     <div style="display:flex;justify-content:space-around;margin-top:30px;">
-                        <a-button type="primary" size="large" @click="generatePostData" :disabled="current_count !== received_data.pic_name.length">
+                        <a-button type="primary" size="large" @click="() => (this.modalVisible = true)"
+                                  :disabled="current_count !== received_data.pic_name.length">
                             提交上传
                             <a-icon type="upload"/>
                         </a-button>
@@ -65,6 +66,14 @@
                 </a-col>
             </a-row>
         </div>
+        <a-modal v-model="modalVisible" title="确定要上传吗" centered @ok="generatePostData"
+                 :okText="upload_status===2 ?'重试':'确认'" cancelText="取消" :destroyOnClose=true :okButtonProps="upload_status===1?{props:{disabled:true}}:{}">
+            <p v-if="upload_status===0">请检查是否有标记错误</p>
+            <p v-if="uploading">正在上传。。。</p>
+            <a-spin v-if="uploading" size="large"/>
+            <a-result v-if="upload_status===1" status="success" title="上传成功" sub-title="即将刷新界面开始新的标记"></a-result>
+            <a-result v-else-if="upload_status===2" status="error" title="上传失败" sub-title="请检查网络连接或者联系你的管理员"></a-result>
+        </a-modal>
     </div>
 </template>
 
@@ -78,10 +87,12 @@ export default {
     directives: {
         viewer: viewer({
             debug: true,
+            loading: true
         }),
     },
     mounted() {
         this.url = this.$store.state.server_url
+        this.fetchClasses()
         this.fetchData()
         console.log("data", this.received_data)
         //设置起始时间
@@ -89,6 +100,9 @@ export default {
     },
     data() {
         return {
+            modalVisible: false,
+            uploading: false,
+            upload_status: 0, // 0 = 还未开始上传， 1 = 上传完毕切成功， 2 = 上传失败
             currentPictureIdx: -1,
             is_classified: [],
             // 接收数据
@@ -108,30 +122,30 @@ export default {
             current_count: 0,
             current_class: "",
             // 分类类别
-            classes: [
-                "1 胰腺钩突 D2-SMA-SMV",
-                "2 胰腺钩突 D3-SMA-SMV",
-                "3 胰腺钩突 D4-SMA-SMV",
-                "4 胰腺钩突 D5-SMA-SMV",
-                "5 胰腺钩突 D2-SMA-SMV",
-                "6 胰腺钩突 D3-SMA-SMV",
-                "7 胰腺钩突 D4-SMA-SMV",
-                "8 胰腺钩突 D5-SMA-SMV",
-                "9 胰腺钩突 D2-SMA-SMV",
-                "10 胰腺钩突 D3-SMA-SMV",
-                "11 胰腺钩突 D4-SMA-SMV",
-            ],
+            classes: [],
             url: "",
         };
     },
     methods: {
+        async fetchClasses() {
+            await axios.get("/api/class_list").then((res) => {
+                // console.log(res.data)
+                // data = res.data["unlabled"]
+                this.classes = res.data["classes"]
+            }).catch((e) => {
+                this.$message.error(e);
+            });
+        },
         async fetchBatchList() {
             let data = undefined
             await axios.get("/api/batch_list").then((res) => {
                 // console.log(res.data)
-                data = res.data["unlabled"]
+                if (res.data["unlabled"] == "") {
+                    this.$message.info("所有图像已经被标记完毕！");
+                } else
+                    data = res.data["unlabled"]
             }).catch((e) => {
-                this.$message.warning(e);
+                this.$message.error(e);
             });
             return data;
         },
@@ -145,8 +159,8 @@ export default {
             await axios.get("/api/img_list/" + unlabeledList[ids]).then((res) => {
                 console.log(res.data)
                 //将获得的图像列表付给received_data
-                // this.received_data.pic_name = res.data["img_list"].slice(0, 10) // 测试前10组样例
-                this.received_data.pic_name = res.data["img_list"]
+                this.received_data.pic_name = res.data["img_list"].slice(0, 5) // 测试前10组样例
+                // this.received_data.pic_name = res.data["img_list"]
                 this.generateImgUrl()
             }).catch((e) => {
                 this.$message.error(e);
@@ -158,7 +172,15 @@ export default {
             this.post_data.end_time = new Date().getTime()
             await axios.post("/post_info", this.post_data).then((res) => {
                 console.log("dddddddddddddddd", res.data)
+                this.uploading = false
+                this.upload_status = 1
+                let _this = this
+                setTimeout(() => {
+                    _this.$router.go(0);
+                }, 1000)
             }).catch((e) => {
+                this.uploading = false
+                this.upload_status = 2
                 this.$message.error(e);
             });
         },
@@ -170,7 +192,6 @@ export default {
                 }
                 this.post_data.results.push(obj)
             }
-            // console.log("objjjjjjjj", this.post_data)
             this.postData();
         },
         // 生成图像对应链接以及将isClassified置为false
@@ -224,6 +245,10 @@ export default {
 </script>
 
 <style scoped>
+.ban-mouse {
+    pointer-events: none;
+}
+
 .left-col-items {
     display: flex;
     justify-content: space-between;
