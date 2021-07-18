@@ -6,21 +6,6 @@
                 <a-icon v-else type="dot-chart" style="color: white;font-size: 1.5rem;"/>
             </div>
             <SideMenu></SideMenu>
-            <!--            <a-menu theme="dark" mode="inline" :default-selected-keys="['1']">
-                            <a-menu-item key="1">
-                                <a-icon type="file-search"/>
-                                <span style="width: 80%!important;text-align: center;margin-left: 25px">病理识别</span>
-                            </a-menu-item>
-                            &lt;!&ndash; 后期待开发选项 &ndash;&gt;
-                            &lt;!&ndash;                <a-menu-item key="2">
-                                                <a-icon type="video-camera"/>
-                                                <span>nav 2</span>
-                                            </a-menu-item>
-                                            <a-menu-item key="3">
-                                                <a-icon type="upload"/>
-                                                <span>nav 3</span>
-                                            </a-menu-item>&ndash;&gt;
-                        </a-menu>-->
         </a-layout-sider>
         <a-layout>
             <a-layout-header style="background: #fff; padding: 0">

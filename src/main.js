@@ -14,7 +14,9 @@ Vue.config.productionTip = false
 Vue.use(Antd)
 Vue.use(vuescroll);
 Vue.use(VueLazyLoad, {
-    error: '../error.png',
+    // error: '../error.png',
+    // 暂时将error图标换成loading
+    error: '../loading.gif',
     loading: '../loading.gif'
 })
 
@@ -31,21 +33,21 @@ axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.transformRequest = [function (data) {
     let ret = ''
     for (let it in data) {
-      ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
     }
     return ret
 }]
 axios.interceptors.request.use(
-  config => {
-    if (localStorage.getItem('token')) {
-			config.headers.Authorization = 'Bearer ';
-      config.headers.Authorization += localStorage.getItem('token');
+    config => {
+        if (localStorage.getItem('token')) {
+            config.headers.Authorization = 'Bearer ';
+            config.headers.Authorization += localStorage.getItem('token');
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
     }
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
 );
 
 Vue.prototype.$axios = axios

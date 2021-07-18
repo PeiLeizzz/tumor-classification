@@ -27,7 +27,9 @@
                 <a-col :sm="14" :md="14" :lg="14" :xl="14" :xxl="14">
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
                         <a-col style="width: 768px;height: 432px ;display:flex;justify-content:center;align-content: center">
-                            <img v-lazy="img_src" alt="" style="max-height: 100%;max-width: 100%">
+                            <img v-if="image_status === 0" :src="img_src" alt="" style="max-height: 100%;max-width: 100%">
+                            <img v-else-if="image_status === 1" src="../../public/loading.gif" alt="" style="max-height: 100%;max-width: 100%">
+                            <img v-else src="../../public/error.png" alt="" style="max-height: 100%;max-width: 100%">
                         </a-col>
                     </a-row>
                     <a-button-group style="display:flex;justify-content:space-around;margin-top:30px;">
@@ -102,6 +104,7 @@ export default {
             modalVisible: false,
             uploading: false,
             upload_status: 0, // 0 = 还未开始上传， 1 = 上传完毕切成功， 2 = 上传失败
+            image_status: 1, // 0 = 未在拉取， 1 = 拉取中， 2 = 拉取失败
             currentPictureIdx: -1,
             is_classified: [],
             // 接收数据
@@ -123,7 +126,7 @@ export default {
             // 分类类别
             classes: [],
             url: "",
-						img_src: ""
+            img_src: ""
         };
     },
     methods: {
@@ -137,8 +140,7 @@ export default {
         async fetchBatchList() {
             let data = undefined
             await axios.get("/api/batch_list").then((res) => {
-                // console.log(res.data)
-                this.$store.commit("setBatchList", res.data)
+                console.log("resdata", res.data)
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有图像已经被标记完毕！");
                 } else
@@ -217,6 +219,7 @@ export default {
             this.refreshSelection()
         },
         refreshSelection() {
+            this.image_status = 1 // 切换为拉取模式
             this.current_class = this.received_data.s_class[this.currentPictureIdx]
             let temp = this.classes
             this.classes = undefined
@@ -239,22 +242,27 @@ export default {
             }
         }
     },
-		watch: {
-			currentPictureIdx() {
-				axios.get('/api/img/' + this.received_data.pic_name[this.currentPictureIdx], {
-					responseType: "arraybuffer"
-				}).then((res) => {
-					console.log(res)
-					return 'data:image/png;base64,' + btoa(
-										new Uint8Array(res.data)
-										.reduce((data, byte) => data + String.fromCharCode(byte), '')
-									);
-				}).then((data) => {
-					console.log(data)
-					this.img_src = data;
-				});
-			}
-		}
+    watch: {
+        currentPictureIdx() {
+            axios.get('/api/img/' + this.received_data.pic_name[this.currentPictureIdx], {
+                responseType: "arraybuffer"
+            }).then((res) => {
+                console.log(res)
+                this.image_status = 1
+                return 'data:image/png;base64,' + btoa(
+                    new Uint8Array(res.data)
+                        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+            }).then((data) => {
+                console.log(data)
+                this.img_src = data;
+                this.image_status = 0
+            }).catch((e) => {
+                console.log(e)
+                this.image_status = 2
+            });
+        }
+    }
 }
 </script>
 
