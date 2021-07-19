@@ -103,6 +103,7 @@ export default {
                     onOk() {
                         _this.clearData()
                         _this.fetchData(data)
+                        _this.$root.$emit('changeSelectedKeys')
                         _this.$destroyAll()
                     },
                     cancelText: '取消',
@@ -113,6 +114,8 @@ export default {
             else {
                 _this.clearData()
                 _this.fetchData(data)
+                // 将数据再发回给side menu
+                _this.$root.$emit('changeSelectedKeys')
             }
         })
         this.url = this.$store.state.server_url
