@@ -26,7 +26,7 @@
 </template>
 <script>
 import ViewAndSelector from '@/components/ViewAndSelector'
-import SideMenu from "@/components/SideMenu";
+import SideMenu from "@/components/SideMenu"
 
 export default {
     name: "MainPage",

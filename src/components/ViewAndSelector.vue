@@ -1,9 +1,13 @@
 <template>
     <div>
         <div>
-            <a-row>
-                <h3 align="center">当前选择图片: {{ received_data.pic_name[currentPictureIdx] }}</h3>
-                <p align="end" style="margin: 0">当前已标记 {{ current_count }}/{{ received_data.pic_name.length }}</p>
+            <a-row type="flex" align="middle" justify="space-between">
+                <a-col :span="5" style="margin-left: 1rem">
+                    <h3 align="center" style="margin: 0">当前选择图片: <span style="color: #006E00;">{{ received_data.pic_name[currentPictureIdx] }}</span></h3>
+                </a-col>
+                <a-col :span="5" style="margin-right: 1rem">
+                    <p align="end" style="margin: 0">当前已标记 {{ current_count }}/{{ received_data.pic_name.length }}</p>
+                </a-col>
             </a-row>
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
@@ -25,6 +29,10 @@
                 </a-col>
                 <!--   图片展示   -->
                 <a-col :sm="14" :md="14" :lg="14" :xl="14" :xxl="14">
+                    <a-row type="flex" justify="space-between" align="middle">
+                        <p style="margin: 0">当前计时</p>
+                        <Timer></Timer>
+                    </a-row>
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
                         <a-col style="width: 768px;height: 432px ;display:flex;justify-content:center;align-content: center">
                             <img v-if="image_status === 0" :src="img_src" alt="" style="max-height: 100%;max-width: 100%">
@@ -82,9 +90,13 @@
 import 'viewerjs/dist/viewer.css'
 import {directive as viewer} from "v-viewer"
 import axios from "axios";
+import Timer from "@/components/Timer"
 
 export default {
     name: "ViewAndSelector",
+    components: {
+        Timer
+    },
     directives: {
         viewer: viewer({
             debug: true,

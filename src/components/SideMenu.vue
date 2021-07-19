@@ -53,6 +53,7 @@ export default {
         this.$root.$on('changeSelectedKeys', () => {
             this.selected_key = this.keyPath
             this.$root.$emit('current_selection_branch', this.selected_key)
+            this.$root.$emit('resetTimer')
         })
     },
     methods: {
