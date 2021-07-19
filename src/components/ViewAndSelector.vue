@@ -94,7 +94,6 @@ export default {
     mounted() {
         let _this = this
         this.$root.$on('changeData', data => {
-            console.log("sssssssssssss", data)
             if (_this.current_count !== 0)
                 _this.$confirm({
                     content: '检测到您有未上传的数据，现在切换页面会导致数据丢失。确定要切换吗？',
@@ -103,6 +102,7 @@ export default {
                     onOk() {
                         _this.clearData()
                         _this.fetchData(data)
+                        _this.$root.$emit('changeSelectedKeys')
                         _this.$destroyAll()
                     },
                     cancelText: '取消',
@@ -113,6 +113,8 @@ export default {
             else {
                 _this.clearData()
                 _this.fetchData(data)
+                // 将数据再发回给side menu
+                _this.$root.$emit('changeSelectedKeys')
             }
         })
         this.url = this.$store.state.server_url

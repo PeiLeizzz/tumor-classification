@@ -43,7 +43,7 @@ export default {
                 if (res.status == 200) {
                     let token = res.data["access_token"];
                     this.$store.commit('$_setToken', token);
-                    this.$store.commit('setUsername', this.form.username)
+                    this.$store.commit('$_setUsername', this.form.username)
                     this.$router.push({path: '/main'});
                 } else {
                     alert('登陆失败');

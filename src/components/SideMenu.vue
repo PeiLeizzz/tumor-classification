@@ -1,12 +1,12 @@
 <template>
     <div>
-        <a-menu theme="dark" mode="inline" :open-keys="openKeys" @openChange="onOpenChange">
+        <a-menu theme="dark" mode="inline" :open-keys="openKeys" @openChange="onOpenChange" :selectedKeys="selected_key" @click="changeImageData">
             <a-sub-menu key="sub1">
                 <span slot="title">
                     <a-icon type="file-search"/>
                     <span style="width: 80%!important;text-align: center;margin-left: 25px">图像标注</span>
                 </span>
-                <a-menu-item v-for="(item,index) in this.batch_list" :key="item" @click="changeImageData(index)">
+                <a-menu-item v-for="(item,index) in this.batch_list" :key="item">
                     {{ item }}
                 </a-menu-item>
             </a-sub-menu>
@@ -37,13 +37,18 @@ export default {
     name: "SideMenu",
     data() {
         return {
+            selected_key: undefined,
             batch_list: [],
             rootSubmenuKeys: ['sub1', 'sub2', 'sub4'],
             openKeys: ['sub1'],
+            keyPath: [],
         };
     },
     mounted() {
         this.fetchBatchList()
+        this.$root.$on('changeSelectedKeys', () => {
+            this.selected_key = this.keyPath
+        })
     },
     methods: {
         onOpenChange(openKeys) {
@@ -54,16 +59,20 @@ export default {
                 this.openKeys = latestOpenKey ? [latestOpenKey] : [];
             }
         },
-        changeImageData(idx) {
-            console.log("ddddddddd", idx)
-            this.$root.$emit('changeData', idx)
+        changeImageData(data) {
+            if (JSON.stringify(this.keyPath) != JSON.stringify(data.keyPath)) {
+                this.keyPath = data.keyPath
+                this.$root.$emit('changeData', data.item.index)
+            }
         },
         async fetchBatchList() {
             await axios.get("/api/batch_list").then((res) => {
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有图像已经被标记完毕！");
-                } else
+                } else {
                     this.batch_list = res.data["unlabled"]
+                    this.keyPath = [this.batch_list[0], 'sub1']
+                }
             }).catch((e) => {
                 this.$message.error(e);
             });
