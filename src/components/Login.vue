@@ -39,22 +39,22 @@ export default {
     methods: {
         async login() {
             await axios.post('/api/auth/token', qs.stringify(this.form))
-						.then((res) => {
-                if (res.status == 200) {
-                    let token = res.data["access_token"];
-                    this.$store.commit('$_setToken', token);
-                    this.$store.commit('$_setUsername', this.form.username)
-                    this.$router.push({path: '/main'});
-                } else {
+                .then((res) => {
+                    if (res.status == 200) {
+                        let token = res.data["access_token"];
+                        this.$store.commit('$_setToken', token);
+                        this.$store.commit('$_setUsername', this.form.username)
+                        this.$router.push({path: '/main'});
+                    } else {
+                        alert('登陆失败');
+                        this.$store.commit('$_removeStorage');
+                        this.$router.push({path: '/'});
+                    }
+                }).catch((e) => {
                     alert('登陆失败');
-										this.$store.$_removeStorage();
-                    this.$router.push({path: '/'});
-                }
-            }).catch((e) => {
-                alert('登陆失败');
-								this.$store.$_removeStorage();
-                console.log(e);
-            })
+                    this.$store.commit('$_removeStorage');
+                    console.log(e);
+                })
         }
     },
 };

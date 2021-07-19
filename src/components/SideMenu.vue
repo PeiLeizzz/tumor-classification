@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-menu theme="dark" mode="inline" :open-keys="openKeys" @openChange="onOpenChange"
-                :selectedKeys="selected_key" @click="changeImageData" :inline-collapsed="collapsed">
+                :selectedKeys="selected_key" @click="changeImageData">
             <a-sub-menu key="sub1">
                 <span slot="title">
                     <a-icon type="file-search"/>
@@ -36,9 +36,6 @@ import axios from "axios";
 
 export default {
     name: "SideMenu",
-    props: {
-        collapsed: true,
-    },
     data() {
         return {
             selected_key: undefined,
