@@ -6,7 +6,7 @@
                     <a-icon type="file-search"/>
                     <span style="width: 80%!important;text-align: center;margin-left: 25px">图像标注</span>
                 </span>
-                <a-menu-item v-for="item in this.batch_list" :key="item">
+                <a-menu-item v-for="(item,index) in this.batch_list" :key="item" @click="changeImageData(index)">
                     {{ item }}
                 </a-menu-item>
             </a-sub-menu>
@@ -53,6 +53,10 @@ export default {
             } else {
                 this.openKeys = latestOpenKey ? [latestOpenKey] : [];
             }
+        },
+        changeImageData(idx) {
+            console.log("ddddddddd", idx)
+            this.$root.$emit('changeData', idx)
         },
         async fetchBatchList() {
             await axios.get("/api/batch_list").then((res) => {

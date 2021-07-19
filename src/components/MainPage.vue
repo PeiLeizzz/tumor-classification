@@ -38,6 +38,10 @@ export default {
             collapsed: false,
         };
     },
+    beforeDestroy() {
+        // 清除事件
+        this.$root.$off()
+    }
 };
 </script>
 <style>

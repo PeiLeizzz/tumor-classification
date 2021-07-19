@@ -92,6 +92,29 @@ export default {
         }),
     },
     mounted() {
+        let _this = this
+        this.$root.$on('changeData', data => {
+            console.log("sssssssssssss", data)
+            if (_this.current_count !== 0)
+                _this.$confirm({
+                    content: '检测到您有未上传的数据，现在切换页面会导致数据丢失。确定要切换吗？',
+                    okText: '确认',
+                    centered: true,
+                    onOk() {
+                        _this.clearData()
+                        _this.fetchData(data)
+                        _this.$destroyAll()
+                    },
+                    cancelText: '取消',
+                    onCancel() {
+                        _this.$destroyAll()
+                    }
+                })
+            else {
+                _this.clearData()
+                _this.fetchData(data)
+            }
+        })
         this.url = this.$store.state.server_url
         this.fetchClasses()
         this.fetchData()
@@ -150,11 +173,11 @@ export default {
             });
             return data;
         },
-        async fetchData() {
+        async fetchData(ids = 0) {
             let unlabeledList = await this.fetchBatchList();
             console.log(unlabeledList.length)
             //随机获得一个unlabeled的batch
-            let ids = Math.floor(Math.random() * unlabeledList.length);
+            // let ids = Math.floor(Math.random() * unlabeledList.length);
             //填写batch_id
             this.post_data.batch_id = unlabeledList[ids]
             await axios.get("/api/img_list/" + unlabeledList[ids]).then((res) => {
@@ -184,6 +207,22 @@ export default {
                 this.$message.error(e);
             });
         },
+        clearData() {
+            this.image_status = 1 // 0 = 未在拉取， 1 = 拉取中， 2 = 拉取失败
+            this.currentPictureIdx = -1
+            this.is_classified = []
+            // 接收数据
+            this.received_data = {
+                pic_url: [],
+                pic_name: [],
+                s_class: [],
+                is_classified: []
+            }
+            this.current_count = 0
+            this.current_class = ""
+            this.img_src = ""
+        }
+        ,
         generatePostData() {
             for (let i = 0; i < this.received_data.pic_name.length; i++) {
                 let obj = {
@@ -256,7 +295,7 @@ export default {
                         .reduce((data, byte) => data + String.fromCharCode(byte), '')
                 );
             }).then((data) => {
-                console.log(data)
+                // console.log(data)
                 this.img_src = data;
                 this.image_status = 0
             }).catch((e) => {
