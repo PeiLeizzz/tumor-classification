@@ -5,12 +5,13 @@
                 <span v-if="!collapsed" style="color: white;font-size: 1.2rem">标注平台</span>
                 <a-icon v-else type="dot-chart" style="color: white;font-size: 1.5rem;"/>
             </div>
-            <SideMenu></SideMenu>
+            <SideMenu ref="side" :collapsed="collapsed"></SideMenu>
         </a-layout-sider>
         <a-layout>
             <a-layout-header class="header" style="background: #fff; padding: 0">
                 <div style="display:flex;justify-content: space-between;align-items: center">
                     <a-icon class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="() => (collapsed = !collapsed)"/>
+                    <p style="margin: 0 1.5rem 0 0;">当前分支: {{ current_selection }}</p>
                     <p style="margin: 0 1.5rem 0 0;">当前用户: {{ this.$store.state.username }}</p>
                 </div>
             </a-layout-header>
@@ -32,9 +33,15 @@ export default {
     components: {
         ViewAndSelector, SideMenu
     },
+    mounted() {
+        this.$root.$on('current_selection_branch', (data) => {
+            this.current_selection = data[0]
+        })
+    },
     data() {
         return {
             collapsed: false,
+            current_selection: undefined
         };
     },
     beforeDestroy() {

@@ -1,6 +1,7 @@
 <template>
     <div>
-        <a-menu theme="dark" mode="inline" :open-keys="openKeys" @openChange="onOpenChange" :selectedKeys="selected_key" @click="changeImageData">
+        <a-menu theme="dark" mode="inline" :open-keys="openKeys" @openChange="onOpenChange"
+                :selectedKeys="selected_key" @click="changeImageData" :inline-collapsed="collapsed">
             <a-sub-menu key="sub1">
                 <span slot="title">
                     <a-icon type="file-search"/>
@@ -35,6 +36,9 @@ import axios from "axios";
 
 export default {
     name: "SideMenu",
+    props: {
+        collapsed: true,
+    },
     data() {
         return {
             selected_key: undefined,
@@ -48,6 +52,7 @@ export default {
         this.fetchBatchList()
         this.$root.$on('changeSelectedKeys', () => {
             this.selected_key = this.keyPath
+            this.$root.$emit('current_selection_branch', this.selected_key)
         })
     },
     methods: {
@@ -72,6 +77,7 @@ export default {
                 } else {
                     this.batch_list = res.data["unlabled"]
                     this.keyPath = [this.batch_list[0], 'sub1']
+                    this.$root.$emit('current_selection_branch', this.keyPath)
                 }
             }).catch((e) => {
                 this.$message.error(e);
