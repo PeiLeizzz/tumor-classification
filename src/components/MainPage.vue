@@ -8,12 +8,11 @@
             <SideMenu></SideMenu>
         </a-layout-sider>
         <a-layout>
-            <a-layout-header style="background: #fff; padding: 0">
-                <a-icon
-                    class="trigger"
-                    :type="collapsed ? 'menu-unfold' : 'menu-fold'"
-                    @click="() => (collapsed = !collapsed)"
-                />
+            <a-layout-header class="header" style="background: #fff; padding: 0">
+                <div style="display:flex;justify-content: space-between;align-items: center">
+                    <a-icon class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="() => (collapsed = !collapsed)"/>
+                    <p style="margin: 0 1.5rem 0 0;">当前用户: {{ this.$store.state.username }}</p>
+                </div>
             </a-layout-header>
             <a-layout-content :style="{ margin: '16px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
                 <!-- 病理诊断界面 -->

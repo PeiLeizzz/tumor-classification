@@ -40,8 +40,9 @@ export default {
             console.log(this.form)
             await axios.post('/api/auth/token', this.form).then((res) => {
                 if (res.status == 200) {
-                    var token = res.data.access_token;
+                    let token = res.data["access_token"];
                     this.$store.commit('$_setToken', token);
+                    this.$store.commit('setUsername', this.form.username)
                     this.$router.push({path: '/main'});
                 } else {
                     alert('登陆失败');

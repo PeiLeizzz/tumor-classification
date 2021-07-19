@@ -7,6 +7,7 @@ export default new Vuex.Store({
     state: {
         server_url: "http://120.55.48.190:8000",
         token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token,
+        username: "",
     },
     getters: {    // 监听数据变化的
         getStorage(state) {   // 获取本地存储的登录信息
@@ -23,6 +24,9 @@ export default new Vuex.Store({
         },
         $_removeStorage(state, value) {  // 删除token
             localStorage.removeItem('token');
+        },
+        setUsername(state, value) {
+            state.username = value
         }
     }
 
