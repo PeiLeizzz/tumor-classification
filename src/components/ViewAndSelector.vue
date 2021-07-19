@@ -256,6 +256,8 @@ export default {
             this.refreshSelection()
         },
         changeImageIdx(idx) {
+            if (idx === this.currentPictureIdx)
+                return
             this.currentPictureIdx = idx
             this.image_status = 1 // 切换为拉取模式
             this.refreshSelection()
