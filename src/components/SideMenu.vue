@@ -60,16 +60,19 @@ export default {
             }
         },
         changeImageData(data) {
-            console.log("ddddddddd", data)
-            this.keyPath = data.keyPath
-            this.$root.$emit('changeData', data.item.index)
+            if (JSON.stringify(this.keyPath) != JSON.stringify(data.keyPath)) {
+                this.keyPath = data.keyPath
+                this.$root.$emit('changeData', data.item.index)
+            }
         },
         async fetchBatchList() {
             await axios.get("/api/batch_list").then((res) => {
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有图像已经被标记完毕！");
-                } else
+                } else {
                     this.batch_list = res.data["unlabled"]
+                    this.keyPath = [this.batch_list[0], 'sub1']
+                }
             }).catch((e) => {
                 this.$message.error(e);
             });
