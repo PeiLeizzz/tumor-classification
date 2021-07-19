@@ -194,7 +194,7 @@ export default {
         async postData() {
             // 填入完成时间戳
             this.post_data.end_time = new Date().getTime()
-            await axios.post("/post_info", this.post_data).then((res) => {
+            await axios.post("/api/post_info", this.post_data).then((res) => {
                 this.uploading = false
                 this.upload_status = 1
                 let _this = this
