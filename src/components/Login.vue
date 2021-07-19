@@ -25,6 +25,7 @@
 
 <script>
 import axios from "axios";
+import qs from "qs";
 
 export default {
     data() {
@@ -37,8 +38,8 @@ export default {
     },
     methods: {
         async login() {
-            console.log(this.form)
-            await axios.post('/api/auth/token', this.form).then((res) => {
+            await axios.post('/api/auth/token', qs.stringify(this.form))
+						.then((res) => {
                 if (res.status == 200) {
                     let token = res.data["access_token"];
                     this.$store.commit('$_setToken', token);
@@ -46,10 +47,12 @@ export default {
                     this.$router.push({path: '/main'});
                 } else {
                     alert('登陆失败');
+										this.$store.$_removeStorage();
                     this.$router.push({path: '/'});
                 }
             }).catch((e) => {
                 alert('登陆失败');
+								this.$store.$_removeStorage();
                 console.log(e);
             })
         }

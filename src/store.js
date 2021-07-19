@@ -22,7 +22,7 @@ export default new Vuex.Store({
             state.token = value;
             localStorage.setItem('token', value);
         },
-        $_removeStorage(state, value) {  // 删除token
+        $_removeStorage() {  // 删除token
             localStorage.removeItem('token');
         },
         $_setUsername(state, value) { // 设置保存用户姓名

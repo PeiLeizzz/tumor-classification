@@ -5,6 +5,7 @@ import store from './store'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css'
 import axios from "axios";
+import qs from "qs";
 import vuescroll from 'vuescroll';
 import VueLazyLoad from 'vue-lazyload'
 
@@ -28,15 +29,15 @@ Vue.prototype.$vuescrollConfig = {
 
 axios.defaults.baseURL = "/api"
 //设置axios为form-data
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.transformRequest = [function (data) {
-    let ret = ''
-    for (let it in data) {
-        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
-    }
-    return ret
-}]
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.headers.get['Content-Type'] = 'application/x-www-form-urlencoded';
+// axios.defaults.transformRequest = [function (data) {
+//     let ret = ''
+//     for (let it in data) {
+//         ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+//     }
+//     return ret
+// }]
 axios.interceptors.request.use(
     config => {
         if (localStorage.getItem('token')) {
@@ -50,7 +51,7 @@ axios.interceptors.request.use(
     }
 );
 
-Vue.prototype.$axios = axios
+Vue.prototype.$axios = axios;
 
 new Vue({
     router,
