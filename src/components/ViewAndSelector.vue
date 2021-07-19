@@ -216,10 +216,10 @@ export default {
         },
         changeImageIdx(idx) {
             this.currentPictureIdx = idx
+            this.image_status = 1 // 切换为拉取模式
             this.refreshSelection()
         },
         refreshSelection() {
-            this.image_status = 1 // 切换为拉取模式
             this.current_class = this.received_data.s_class[this.currentPictureIdx]
             let temp = this.classes
             this.classes = undefined
@@ -230,6 +230,7 @@ export default {
                 this.$message.warning("这已经是第一张图!")
             } else {
                 this.currentPictureIdx--;
+                this.image_status = 1 // 切换为拉取模式
                 this.refreshSelection()
             }
         },
@@ -238,6 +239,7 @@ export default {
                 this.$message.warning("这已经是最后一张图!")
             } else {
                 this.currentPictureIdx++;
+                this.image_status = 1 // 切换为拉取模式
                 this.refreshSelection()
             }
         }
