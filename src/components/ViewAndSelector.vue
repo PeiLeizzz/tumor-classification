@@ -1,17 +1,10 @@
 <template>
     <div>
         <div>
-            <a-row type="flex" align="middle" justify="space-between">
-                <a-col :span="5" style="margin-left: 1rem">
-                    <h3 align="center" style="margin: 0">当前选择图片: <span style="color: #006E00;">{{ received_data.pic_name[currentPictureIdx] }}</span></h3>
-                </a-col>
-                <a-col :span="5" style="margin-right: 1rem">
-                    <p align="end" style="margin: 0">当前已标记 {{ current_count }}/{{ received_data.pic_name.length }}</p>
-                </a-col>
-            </a-row>
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
-                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5">
+                <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5" style="display: flex;flex-flow: column;justify-content: center;align-items: center">
+                    <p align="end" style="margin: 0 0 0.5rem 0">当前已标记 {{ current_count }}/{{ received_data.pic_name.length }}</p>
                     <vue-scroll>
                         <div style="height: 550px;display:flex;align-items: center;flex-flow: column">
                             <div v-for="(item,index) in this.received_data.pic_name" :key="item" style="width: 80%">
@@ -29,12 +22,21 @@
                 </a-col>
                 <!--   图片展示   -->
                 <a-col :sm="14" :md="14" :lg="14" :xl="14" :xxl="14">
-                    <a-row type="flex" justify="space-between" align="middle">
-                        <p style="margin: 0">当前计时</p>
-                        <Timer></Timer>
+                    <a-row type="flex" justify="space-around" align="middle" style="margin-bottom: 0.625rem">
+                        <a-col :span="5">
+                            <div style="display:flex;justify-content: center;align-items: center">
+                                <p style="margin: 0">当前计时</p>
+                                <Timer></Timer>
+                            </div>
+                        </a-col>
+                        <a-col :span="14">
+                            <h3 align="center" style="margin: 0">当前选择图片: <span style="color: #006E00;">{{ received_data.pic_name[currentPictureIdx] }}</span>
+                            </h3>
+                        </a-col>
+                        <a-col :span="5"></a-col>
                     </a-row>
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
-                        <a-col style="width: 768px;height: 432px ;display:flex;justify-content:center;align-content: center">
+                        <a-col style="width: 768px;height: 432px;display:flex;justify-content:center;align-content: center">
                             <img v-if="image_status === 0" :src="img_src" alt="" style="max-height: 100%;max-width: 100%">
                             <img v-else-if="image_status === 1" src="../../public/loading.gif" alt="" style="max-height: 100%;max-width: 100%">
                             <img v-else src="../../public/error.png" alt="" style="max-height: 100%;max-width: 100%">
@@ -213,7 +215,8 @@ export default {
                 this.upload_status = 1
                 let _this = this
                 setTimeout(() => {
-                    _this.$router.go(0);
+                    // _this.$router.go(0);//注释掉
+                    window.location.reload()
                 }, 1000)
             }).catch((e) => {
                 this.uploading = false

@@ -5,7 +5,9 @@
                 <span v-if="!collapsed" style="color: white;font-size: 1.2rem">标注平台</span>
                 <a-icon v-else type="dot-chart" style="color: white;font-size: 1.5rem;"/>
             </div>
-            <SideMenu ref="side" :collapsed="collapsed"></SideMenu>
+						<vue-scroll style="height: 80%">
+							<SideMenu></SideMenu>
+						</vue-scroll>
         </a-layout-sider>
         <a-layout>
             <a-layout-header class="header" style="background: #fff; padding: 0">
