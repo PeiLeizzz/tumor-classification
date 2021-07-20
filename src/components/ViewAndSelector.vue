@@ -213,7 +213,8 @@ export default {
                 this.upload_status = 1
                 let _this = this
                 setTimeout(() => {
-                    _this.$router.go(0);
+                    // _this.$router.go(0);//注释掉
+                    window.location.reload()
                 }, 1000)
             }).catch((e) => {
                 this.uploading = false
