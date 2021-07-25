@@ -27,7 +27,7 @@
     </a-layout>
 </template>
 <script>
-import ViewAndSelector from '@/components/ViewAndSelector'
+import ViewAndSelector from '@/components/ViewAndSelector2'
 import SideMenu from "@/components/SideMenu"
 
 export default {

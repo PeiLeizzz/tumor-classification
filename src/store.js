@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        server_url: "http://120.55.48.190:8000",
+        server_url: "https://39.100.80.45:443",
         token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token,
         username: localStorage.getItem('username') ? localStorage.getItem('username') : '', // username
     },
@@ -22,7 +22,8 @@ export default new Vuex.Store({
             state.token = value;
             localStorage.setItem('token', value);
         },
-        $_removeStorage() {  // 删除token
+        $_removeStorage(state) {  // 删除token
+						state.token = '';
             localStorage.removeItem('token');
         },
         $_setUsername(state, value) { // 设置保存用户姓名

@@ -42,7 +42,7 @@ module.exports = {
         proxy: {
             '/api': {
                 //代理api
-                target: 'http://120.55.48.190:8000', // 代理接口(注意只要域名就够了)
+                target: 'https://39.100.80.45:443', // 代理接口(注意只要域名就够了)
                 changeOrigin: true, //是否跨域
                 ws: true, // proxy websockets
                 pathRewrite: {
