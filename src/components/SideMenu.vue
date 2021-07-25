@@ -11,22 +11,15 @@
                     {{ item }}
                 </a-menu-item>
             </a-sub-menu>
-            <!--     后期开发       -->
-            <!--            <a-sub-menu key="sub4">
-                            <span slot="title"><a-icon type="setting"/><span>Navigation Three</span></span>
-                            <a-menu-item key="9">
-                                Option 9
-                            </a-menu-item>
-                            <a-menu-item key="10">
-                                Option 10
-                            </a-menu-item>
-                            <a-menu-item key="11">
-                                Option 11
-                            </a-menu-item>
-                            <a-menu-item key="12">
-                                Option 12
-                            </a-menu-item>
-                        </a-sub-menu>-->
+						<a-sub-menu key="sub2">
+						    <span slot="title">
+						        <a-icon type="file-search"/>
+						        <span style="width: 80%!important;text-align: center;margin-left: 25px">视频标注</span>
+						    </span>
+								<a-menu-item key="视频标注">
+									视频标注
+								</a-menu-item>
+						</a-sub-menu>
         </a-menu>
     </div>
 </template>
@@ -40,13 +33,15 @@ export default {
         return {
             selected_key: undefined,
             batch_list: [],
+						video_list: [],
             rootSubmenuKeys: ['sub1', 'sub2', 'sub4'],
-            openKeys: ['sub1'],
+            openKeys: ['sub1', 'sub2'],
             keyPath: [],
         };
     },
     mounted() {
-        this.fetchBatchList()
+        //this.fetchBatchList()
+				this.fetchVideoList()
         this.$root.$on('changeSelectedKeys', () => {
             this.selected_key = this.keyPath
             this.$root.$emit('current_selection_branch', this.selected_key)
@@ -81,6 +76,19 @@ export default {
                 this.$message.error(e);
             });
         },
+				async fetchVideoList() {
+				    await axios.get("/api/video_list").then((res) => {
+				        if (res.data["unlabled"] == "") {
+				            this.$message.info("所有视频已经被标记完毕！");
+				        } else {
+				            this.video_list = res.data["unlabled"]
+				            this.keyPath = ['视频标注', 'sub2']
+				            this.$root.$emit('current_selection_branch', this.keyPath)
+				        }
+				    }).catch((e) => {
+				        this.$message.error(e);
+				    });
+				},
     },
 }
 </script>
