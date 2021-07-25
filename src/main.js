@@ -8,11 +8,14 @@ import axios from "axios";
 import qs from "qs";
 import vuescroll from 'vuescroll';
 import VueLazyLoad from 'vue-lazyload'
+import VideoPlayer from 'vue-video-player'
+require('vue-video-player/node_modules/video.js/dist/video-js.css')
+require('vue-video-player/src/custom-theme.css')
 
 
 Vue.config.productionTip = false
-
 Vue.use(Antd)
+Vue.use(VideoPlayer)
 Vue.use(vuescroll);
 Vue.use(VueLazyLoad, {
     // error: '../error.png',

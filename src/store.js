@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        server_url: "http://120.55.48.190:8000",
+        server_url: "https://39.100.80.45:443",
         token: localStorage.getItem('token') ? localStorage.getItem('token') : '',   // token,
         username: localStorage.getItem('username') ? localStorage.getItem('username') : '', // username
     },
