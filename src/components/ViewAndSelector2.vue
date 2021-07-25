@@ -55,7 +55,10 @@
 									@statechanged="playerStateChanged($event)"
 									@ready="playerReadied">
 								</video-player>
-								<!-- <video style="height: 100%; weight: 100%;" :src="options.sources.src"></video> -->
+								<video style="height: 60%; weight: 100%;" controls muted="muted">
+									<source src="https://39.100.80.45/api/video/ZXlKaGJHY2lPaUpJVXpVeE1pSXNJbWxoZENJNk1UWXlOekl4TURnek9Dd2laWGh3SWpveE5qSTNNalUwTURNNGZRLmV5SjFjMlZ5YVdRaU9pSjBNREF4SWl3aWRtbGtaVzlmYVdRaU9pSTFOekkwTmpVeE5TNXRjRFFpZlEudkJsbUctV013aDdKT0NseEt4bmx2Ym43NC0xZkpwNlhpUy1SdWJpTVdZZldVWmQybFI5VEYzYV8yWndqbUlJbUM5aFlxQ3E4LVhzQ20yTmRlYklmT0E=" 
+									type="video/mp4" />
+								</video>
 							</div>
 						</a-col>
 					</a-row>
@@ -133,7 +136,7 @@
 						centered: true,
 						onOk() {
 							_this.clearData()
-							
+							_this.fetchVideoList()
 							_this.$root.$emit('changeSelectedKeys')
 							_this.$destroyAll()
 						},
@@ -144,7 +147,7 @@
 					})
 				else {
 					_this.clearData()
-					
+					_this.fetchVideoList()
 					// 将数据再发回给side menu
 					_this.$root.$emit('changeSelectedKeys')
 				}
@@ -152,7 +155,6 @@
 			this.url = this.$store.state.server_url;
 			this.fetchClasses();
 			this.fetchVideoList();
-			console.log("video", this.received_data.video);
 			//设置起始时间
 			this.post_data.start_time = new Date().getTime();
 		},
@@ -192,8 +194,8 @@
 					fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
 					sources: [{
 						type: "video/mp4", // 类型
-						src: "", // url地址
-					}, ],
+						src: "" // url地址
+					}],
 					poster: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1606462956126&di=2d87964d4faf656af55d09d938640d97&imgtype=0&src=http%3A%2F%2Fattachments.gfan.com%2Fforum%2Fattachments2%2F201310%2F10%2F150326y7dzdd8d4kpjjdsd.jpg", // 封面地址
 					notSupportedMessage: "此视频暂无法播放，请稍后再试", // 允许覆盖Video.js无法播放媒体源时显示的默认信息。
 					controlBar: {
@@ -248,18 +250,20 @@
 				});
 			},
 			clearData() {
-				this.currentVideoIdx = -1
+				this.currentVideoIdx = 0
 				this.is_classified = []
 				// 接收数据
 				this.received_data = {
-					video_id: [],
-					video_url: [],
+					video: [],
 					s_class: [],
 					is_classified: []
 				}
 				this.current_count = 0
 				this.current_class = ""
-				this.options.sources.src = ""
+				this.options.sources.src = [{
+					type: "video/mp4", // 类型
+					src: "", // url地址
+				}]
 			},
 			generatePostData() {
 				for (let i = 0; i < this.received_data.video.length; i++) {
@@ -366,7 +370,9 @@
 		},
 		watch: {
 			currentVideoIdx() {
-				this.options.sources.src = this.received_data.video[this.currentVideoIdx].video_url;
+				this.options.sources[0].src = this.received_data.video[this.currentVideoIdx].video_url;
+				//this.$refs.video.src = this.options.sources[0].src;
+				console.log(this.options.sources[0].src)
 			}
 		}
 	}
