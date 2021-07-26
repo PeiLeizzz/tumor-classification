@@ -87,11 +87,9 @@
         </div>
         <a-modal v-model="modalVisible" title="确定要上传吗" centered @ok="generatePostData" :okText="upload_status===2 ?'重试':'确认'"
                  cancelText="取消" :destroyOnClose=true :okButtonProps="upload_status===1?{props:{disabled:true}}:{}">
-            <p v-if="upload_status===0">请检查是否有标记错误</p>
-            <p v-if="uploading">正在上传。。。</p>
+            <p v-if="upload_status===0">上传后不可修改</p>
+            <p v-else-if="uploading">正在上传。。。</p>
             <a-spin v-if="uploading" size="large"/>
-            <a-result v-if="upload_status===1" status="success" title="上传成功" sub-title="即将刷新界面开始新的标记"></a-result>
-            <a-result v-else-if="upload_status===2" status="error" title="上传失败" sub-title="请检查网络连接或者联系你的管理员"></a-result>
         </a-modal>
     </div>
 </template>
@@ -184,7 +182,6 @@ export default {
                     type: "video/mp4", // 类型
                     src: "" // url地址
                 }],
-                poster: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1606462956126&di=2d87964d4faf656af55d09d938640d97&imgtype=0&src=http%3A%2F%2Fattachments.gfan.com%2Fforum%2Fattachments2%2F201310%2F10%2F150326y7dzdd8d4kpjjdsd.jpg", // 封面地址
                 notSupportedMessage: "此视频暂无法播放，请稍后再试", // 允许覆盖Video.js无法播放媒体源时显示的默认信息。
                 controlBar: {
                     timeDivider: true, // 是否显示当前时间和持续时间的分隔符，"/"
@@ -224,18 +221,22 @@ export default {
             // 填入完成时间戳
             this.post_data.end_time = new Date().getTime()
             await axios.post("/api/post_video_result", this.post_data).then((res) => {
-                this.uploading = false
-                this.upload_status = 1
-                let _this = this
+								this.upload_status = 1;
+                this.uploading = true;
+                let _this = this;
                 setTimeout(() => {
                     // _this.$router.go(0);//注释掉
-                    window.location.reload()
+                    // window.location.reload()
+										this.clearData();
+										this.fetchVideoList();
+										this.$message.success("上传成功")
                 }, 1000)
             }).catch((e) => {
-                this.uploading = false
-                this.upload_status = 2
+								this.upload_status = 2;
                 this.$message.error(e);
             });
+						this.uploading = false;
+						this.upload_status = 0;
         },
         clearData() {
             this.currentVideoIdx = 0
@@ -258,6 +259,8 @@ export default {
             this.$set(this.post_data, "video_name", this.received_data.video_id[this.currentVideoIdx]);
             this.$set(this.post_data, "results", this.received_data.s_class[this.currentVideoIdx]);
             this.postData();
+						this.modalVisible = false;
+						this.$root.$emit('resetTimer')
         },
         // 将视频的isClassified置为false
         generateVideoClass() {
@@ -304,12 +307,14 @@ export default {
                         _this.currentVideoIdx = idx;
                         _this.image_status = 1 // 切换为拉取模式
                         _this.refreshSelection()
+												_this.$root.$emit('resetTimer')
                     }
                 });
             } else {
                 this.currentVideoIdx = idx;
                 this.image_status = 1 // 切换为拉取模式
                 this.refreshSelection()
+								this.$root.$emit('resetTimer')
             }
         },
         refreshSelection() {
