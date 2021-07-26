@@ -40,8 +40,8 @@ export default {
         };
     },
     mounted() {
-        //this.fetchBatchList()
-				this.fetchVideoList()
+        this.fetchBatchList()
+				//this.fetchVideoList()
         this.$root.$on('changeSelectedKeys', () => {
             this.selected_key = this.keyPath
             this.$root.$emit('current_selection_branch', this.selected_key)
