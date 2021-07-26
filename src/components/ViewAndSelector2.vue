@@ -289,13 +289,14 @@
 				if (idx === this.currentVideoIdx) {
 					return
 				}
-				
+				// 如果当前有对该视频的标注
 				if (this.received_data.is_classified[this.currentVideoIdx]) {
 					let _this = this;
 					this.$confirm({
 						title: '确定要切换吗',
 						content: '视频标注每次提交一个，如果切换视频，会导致当前视频的标注清空',
 						onOk() {
+							_this.current_count--;
 							_this.received_data.is_classified[_this.currentVideoIdx] = false;
 							_this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
 							_this.currentVideoIdx = idx;
@@ -320,50 +321,14 @@
 				if (this.currentVideoIdx === 0) {
 					this.$message.warning("这已经是第一个视频!")
 				} else {
-					if (this.received_data.is_classified[this.currentVideoIdx]) {
-						let _this = this;
-						this.$confirm({
-							title: '确定要切换吗',
-							content: '视频标注每次提交一个，如果切换视频，会导致当前视频的标注清空',
-							onOk() {
-								_this.received_data.is_classified[_this.currentVideoIdx] = false;
-								_this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
-								_this.currentVideoIdx--;
-								_this.image_status = 1 // 切换为拉取模式
-								_this.refreshSelection()
-							}
-						});
-					}
-					else {
-						this.currentVideoIdx--;
-						this.image_status = 1 // 切换为拉取模式
-						this.refreshSelection()
-					}
+					this.changeVideoIdx(this.currentVideoIdx - 1);
 				}
 			},
 			nextVideoIdx() {
 				if (this.currentVideoIdx === this.received_data.video_id.length - 1) {
 					this.$message.warning("这已经是最后一个视频!")
 				} else {
-					if (this.received_data.is_classified[this.currentVideoIdx]) {
-						let _this = this;
-						this.$confirm({
-							title: '确定要切换吗',
-							content: '视频标注每次提交一个，如果切换视频，会导致当前视频的标注清空',
-							onOk() {
-								_this.received_data.is_classified[_this.currentVideoIdx] = false;
-								_this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
-								_this.currentVideoIdx++;
-								_this.image_status = 1 // 切换为拉取模式
-								_this.refreshSelection()
-							}
-						});
-					}
-					else {
-						this.currentVideoIdx++;
-						this.image_status = 1 // 切换为拉取模式
-						this.refreshSelection()
-					}
+					this.changeVideoIdx(this.currentVideoIdx + 1);
 				}
 			},
 			updateVideoUrl(id = 0) {
