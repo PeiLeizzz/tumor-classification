@@ -5,9 +5,9 @@
                 <span v-if="!collapsed" style="color: white;font-size: 1.2rem">标注平台</span>
                 <a-icon v-else type="dot-chart" style="color: white;font-size: 1.5rem;"/>
             </div>
-						<vue-scroll style="height: 80%">
-							<SideMenu></SideMenu>
-						</vue-scroll>
+            <vue-scroll style="height: 80%">
+                <SideMenu></SideMenu>
+            </vue-scroll>
         </a-layout-sider>
         <a-layout>
             <a-layout-header class="header" style="background: #fff; padding: 0">
@@ -27,7 +27,7 @@
     </a-layout>
 </template>
 <script>
-import ViewAndSelector from '@/components/ViewAndSelector2'
+import ViewAndSelector from '@/components/ViewAndSelector'
 import SideMenu from "@/components/SideMenu"
 
 export default {
