@@ -4,12 +4,12 @@
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
                 <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5" style="display: flex;flex-flow: column;justify-content: center;align-items: center">
-                    <p align="end" style="margin: 0 0 0.5rem 0">当前已标记 {{ current_count }}/{{ received_data.video.length }}</p>
+                    <p align="end" style="margin: 0 0 0.5rem 0">当前已标记 {{ current_count }}/{{ received_data.video_id.length }}</p>
                     <vue-scroll>
                         <div style="height: 550px;display:flex;align-items: center;flex-flow: column">
-                            <div v-for="(item,index) in this.received_data.video" :key="item.video_id" style="width: 80%">
+                            <div v-for="(item,index) in this.received_data.video_id" :key="item" style="width: 80%">
                                 <div :class="currentVideoIdx === index ? 'left-col-items-selected':'left-col-items'" @click="changeVideoIdx(index)">
-                                    {{ item.video_id }}
+                                    {{ item }}
                                     <div>
                                         <!-- 控制√的颜色 -->
                                         <a-icon v-if="!received_data.is_classified[index]" type="check-circle" theme="filled"/>
@@ -30,9 +30,7 @@
                             </div>
                         </a-col>
                         <a-col :span="14">
-                            <h3 align="center" style="margin: 0">当前选择视频: <span style="color: #006E00;">{{
-                                    received_data.video[currentVideoIdx].video_id
-                                }}</span>
+                            <h3 align="center" style="margin: 0">当前选择视频: <span style="color: #006E00;">{{ received_data.video_id[currentVideoIdx] }}</span>
                             </h3>
                         </a-col>
                         <a-col :span="5"></a-col>
@@ -40,22 +38,14 @@
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
                         <a-col style="width: 768px;height: 432px;display:flex;justify-content:center;align-content: center">
                             <div class="my_video">
-                                <video-player
-                                    class="video-player vjs-custom-skin"
-                                    ref="videoPlayer"
-                                    :playsinline="true"
-                                    :options="options"
-                                    @play="onPlayerPlay($event)"
-                                    @pause="onPlayerPause($event)"
-                                    @ended="onPlayerEnded($event)"
-                                    @waiting="onPlayerWaiting($event)"
-                                    @playing="onPlayerPlaying($event)"
-                                    @loadeddata="onPlayerLoadeddata($event)"
-                                    @timeupdate="onPlayerTimeupdate($event)"
-                                    @canplay="onPlayerCanplay($event)"
-                                    @canplaythrough="onPlayerCanplaythrough($event)"
-                                    @statechanged="playerStateChanged($event)"
-                                    @ready="playerReadied">
+                                <video-player class="video-player vjs-custom-skin" ref="videoPlayer" :playsinline="true" :options="options"
+                                              @play="onPlayerPlay($event)" @pause="onPlayerPause($event)" @ended="onPlayerEnded($event)"
+                                              @waiting="onPlayerWaiting($event)"
+                                              @playing="onPlayerPlaying($event)" @loadeddata="onPlayerLoadeddata($event)"
+                                              @timeupdate="onPlayerTimeupdate($event)"
+                                              @canplay="onPlayerCanplay($event)" @canplaythrough="onPlayerCanplaythrough($event)"
+                                              @statechanged="playerStateChanged($event)"
+                                              @ready="playerReadied">
                                 </video-player>
                             </div>
                         </a-col>
@@ -72,7 +62,7 @@
                     </a-button-group>
                     <div style="display:flex;justify-content:space-around;margin-top:30px;">
                         <a-button type="primary" size="large" @click="() => (this.modalVisible = true)"
-                                  :disabled="current_count !== received_data.video.length">
+                                  :disabled="!this.received_data.is_classified[this.currentVideoIdx]">
                             提交上传
                             <a-icon type="upload"/>
                         </a-button>
@@ -83,7 +73,7 @@
                     <div style="display: flex;justify-content: center;align-items: center;margin-top: 10px;">
                         <a-space direction="vertical">
                             <div v-for="(subClass) in classes" :key="subClass">
-                                <div class="right-col-items-selected" v-if="current_class===subClass" @click="updateClassInfo(subClass)">
+                                <div class="right-col-items-selected" v-if="current_class.includes(subClass)" @click="updateClassInfo(subClass)">
                                     {{ subClass }}
                                 </div>
                                 <div class="right-col-items" v-else @click="updateClassInfo(subClass)">
@@ -164,19 +154,20 @@ export default {
             is_classified: [],
             // 接收数据
             received_data: {
-                video: [],
+                video_id: [],
+                video_url: [],
                 s_class: [],
                 is_classified: []
             },
             // 上传数据
             post_data: {
-                video_id: "",
+                video_name: "",
                 start_time: "",
                 end_time: "",
                 results: []
             },
             current_count: 0,
-            current_class: "",
+            current_class: [],
             // 分类类别
             classes: [],
             url: "",
@@ -217,11 +208,12 @@ export default {
                 if (res.data["unlabled"] == "") {
                     this.$message.info("所有视频已经被标记完毕！");
                 } else {
-                    //this.received_data.video = res.data["unlabled"];
                     for (let i = 0; i < res.data["unlabled"].length; i++) {
-                        this.received_data.video.push(res.data["unlabled"][i])
+                        this.received_data.video_id.push(res.data["unlabled"][i].video_id);
+                        this.received_data.video_url.push(res.data["unlabled"][i].video_url);
                     }
-                    this.generateVideoUrl();
+                    this.generateVideoClass();
+                    this.updateVideoUrl();
                 }
             }).catch((e) => {
                 this.$message.error(e);
@@ -250,50 +242,75 @@ export default {
             this.is_classified = []
             // 接收数据
             this.received_data = {
-                video: [],
+                video_id: [],
+                video_url: [],
                 s_class: [],
                 is_classified: []
             }
             this.current_count = 0
-            this.current_class = ""
+            this.current_class = []
             this.options.sources.src = [{
                 type: "video/mp4", // 类型
                 src: "", // url地址
             }]
         },
         generatePostData() {
-            for (let i = 0; i < this.received_data.video.length; i++) {
-                let obj = {
-                    video_id: this.received_data.video[i].video_id,
-                    video_class: this.received_data.s_class[i]
-                }
-                this.post_data.results.push(obj)
-            }
+            this.$set(this.post_data, "video_name", this.received_data.video_id[this.currentVideoIdx]);
+            this.$set(this.post_data, "results", this.received_data.s_class[this.currentVideoIdx]);
             this.postData();
         },
-        // 生成视频对应链接以及将isClassified置为false
-        generateVideoUrl() {
-            for (let i = 0; i < this.received_data.video.length; i++) {
+        // 将视频的isClassified置为false
+        generateVideoClass() {
+            for (let i = 0; i < this.received_data.video_id.length; i++) {
                 this.received_data.is_classified.push(false)
-                this.received_data.s_class.push("")
+                this.received_data.s_class.push([])
             }
             //默认初始图像下标为0
             this.currentVideoIdx = 0;
         },
         updateClassInfo(value) {
-            // this.received_data.s_class[this.currentVideoIdx] = e.target.value
-            this.$set(this.received_data.s_class, this.currentVideoIdx, value)
-            if (!this.received_data.is_classified[this.currentVideoIdx])
-                this.current_count++
-            this.$set(this.received_data.is_classified, this.currentVideoIdx, true)
+            let id = this.received_data.s_class[this.currentVideoIdx].indexOf(value);
+            // 如果之前已经选了，则删除；未选，则加入
+            if (id !== -1) {
+                this.received_data.s_class[this.currentVideoIdx].splice(id, 1);
+            } else {
+                this.received_data.s_class[this.currentVideoIdx].push(value);
+            }
+
+            if (!this.received_data.is_classified[this.currentVideoIdx]) {
+                this.current_count++;
+                this.$set(this.received_data.is_classified, this.currentVideoIdx, true)
+            } else if (this.received_data.s_class[this.currentVideoIdx].length === 0) {
+                // 如果多选全都取消了，要重置状态
+                this.current_count--;
+                this.$set(this.received_data.is_classified, this.currentVideoIdx, false)
+            }
             this.refreshSelection()
         },
         changeVideoIdx(idx) {
-            if (idx === this.currentVideoIdx)
+            if (idx === this.currentVideoIdx) {
                 return
-            this.currentVideoIdx = idx
-            this.image_status = 1 // 切换为拉取模式
-            this.refreshSelection()
+            }
+            // 如果当前有对该视频的标注
+            if (this.received_data.is_classified[this.currentVideoIdx]) {
+                let _this = this;
+                this.$confirm({
+                    title: '确定要切换吗',
+                    content: '视频标注每次提交一个，如果切换视频，会导致当前视频的标注清空',
+                    onOk() {
+                        _this.current_count--;
+                        _this.received_data.is_classified[_this.currentVideoIdx] = false;
+                        _this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
+                        _this.currentVideoIdx = idx;
+                        _this.image_status = 1 // 切换为拉取模式
+                        _this.refreshSelection()
+                    }
+                });
+            } else {
+                this.currentVideoIdx = idx;
+                this.image_status = 1 // 切换为拉取模式
+                this.refreshSelection()
+            }
         },
         refreshSelection() {
             this.current_class = this.received_data.s_class[this.currentVideoIdx]
@@ -305,19 +322,18 @@ export default {
             if (this.currentVideoIdx === 0) {
                 this.$message.warning("这已经是第一个视频!")
             } else {
-                this.currentVideoIdx--;
-                this.image_status = 1 // 切换为拉取模式
-                this.refreshSelection()
+                this.changeVideoIdx(this.currentVideoIdx - 1);
             }
         },
         nextVideoIdx() {
-            if (this.currentVideoIdx === this.received_data.video.length - 1) {
+            if (this.currentVideoIdx === this.received_data.video_id.length - 1) {
                 this.$message.warning("这已经是最后一个视频!")
             } else {
-                this.currentVideoIdx++;
-                this.image_status = 1 // 切换为拉取模式
-                this.refreshSelection()
+                this.changeVideoIdx(this.currentVideoIdx + 1);
             }
+        },
+        updateVideoUrl(id = 0) {
+            this.options.sources[0].src = this.received_data.video_url[id];
         },
         // 播放回调
         onPlayerPlay($event) {
@@ -366,9 +382,7 @@ export default {
     },
     watch: {
         currentVideoIdx() {
-            this.options.sources[0].src = this.received_data.video[this.currentVideoIdx].video_url;
-            //this.$refs.video.src = this.options.sources[0].src;
-            console.log(this.options.sources[0].src)
+            this.updateVideoUrl(this.currentVideoIdx);
         }
     }
 }
@@ -428,7 +442,7 @@ export default {
     padding: 0 10px;
     border-radius: 1rem;
     border-color: #40A9FF;
-    background-color: gray;
+    background-color: lightseagreen;
     color: white;
     cursor: pointer;
 }
