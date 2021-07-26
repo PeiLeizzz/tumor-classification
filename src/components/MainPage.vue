@@ -20,30 +20,34 @@
             <a-layout-content :style="{ margin: '16px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
                 <!-- 病理诊断界面 -->
                 <vue-scroll>
-                    <ViewAndSelector></ViewAndSelector>
+                    <ViewAndSelector v-if="current_content == 'sub1'"></ViewAndSelector>
+                    <VideoSelector v-else-if="current_content == 'sub2'"></VideoSelector>
                 </vue-scroll>
             </a-layout-content>
         </a-layout>
     </a-layout>
 </template>
 <script>
-import ViewAndSelector from '@/components/ViewAndSelector2'
+import VideoSelector from '@/components/VideoSelector'
+import ViewAndSelector from '@/components/ViewAndSelector'
 import SideMenu from "@/components/SideMenu"
 
 export default {
     name: "MainPage",
     components: {
-        ViewAndSelector, SideMenu
+        ViewAndSelector, VideoSelector, SideMenu
     },
     mounted() {
         this.$root.$on('current_selection_branch', (data) => {
             this.current_selection = data[0]
+            this.current_content = data[1]
         })
     },
     data() {
         return {
             collapsed: false,
-            current_selection: undefined
+            current_selection: undefined,
+            current_content: "sub1"
         };
     },
     beforeDestroy() {
