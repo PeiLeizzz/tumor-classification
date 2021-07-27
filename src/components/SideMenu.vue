@@ -41,11 +41,14 @@ export default {
     },
     mounted() {
         this.fetchBatchList()
-        this.$root.$on('changeSelectedKeys', () => {
-            this.selected_key = this.keyPath;
+        this.$root.$on('changeSelectedKeys', keyPath => {
+						console.log("keyPath", keyPath)
+						this.keyPath = keyPath;
+            this.selected_key = keyPath;
             this.$root.$emit('current_selection_branch', this.selected_key);
             this.$root.$emit('resetTimer');
         })
+				
     },
     methods: {
         onOpenChange(openKeys) {
@@ -58,13 +61,14 @@ export default {
         },
         changeData(data) {
             if (JSON.stringify(this.keyPath) != JSON.stringify(data.keyPath)) {
-                this.keyPath = data.keyPath;
-								if (this.keyPath[1] === 'sub1') {
-									this.$root.$emit('changeDataOfImage', data.item.index);
+                //this.keyPath = data.keyPath;
+								if (data.keyPath[1] === 'sub1') {
+									console.log("emit: changeDataOfImage");
+									this.$root.$emit('changeDataOfImage', data);
 								}
-								else if (this.keyPath[1] === 'sub2') {
+								else if (data.keyPath[1] === 'sub2') {
 									console.log("emit: changeDataOfVideo");
-									this.$root.$emit('changeDataOfVideo', data.item.index);
+									this.$root.$emit('changeDataOfVideo', data);
 								}
             }
         },

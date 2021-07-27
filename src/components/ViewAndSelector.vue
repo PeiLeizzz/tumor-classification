@@ -108,6 +108,7 @@ export default {
     mounted() {
         let _this = this
         this.$root.$on('changeDataOfImage', data => {
+					console.log("on: changeDataOfImage");
             if (_this.$store.state.current_count !== 0)
                 _this.$confirm({
                     content: '检测到您有未上传的数据，现在切换页面会导致数据丢失。确定要切换吗？',
@@ -115,8 +116,8 @@ export default {
                     centered: true,
                     onOk() {
                         _this.clearData()
-                        _this.fetchData(data)
-                        _this.$root.$emit('changeSelectedKeys')
+                        _this.fetchData(data.item.index)
+                        _this.$root.$emit('changeSelectedKeys', data.keyPath)
                         _this.$destroyAll()
                     },
                     cancelText: '取消',
@@ -126,9 +127,9 @@ export default {
                 })
             else {
                 _this.clearData()
-                _this.fetchData(data)
+                _this.fetchData(data.item.index)
                 // 将数据再发回给side menu
-                _this.$root.$emit('changeSelectedKeys')
+                _this.$root.$emit('changeSelectedKeys', data.keyPath)
             }
         })
         this.url = this.$store.state.server_url

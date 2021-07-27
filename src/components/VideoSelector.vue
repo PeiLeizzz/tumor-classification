@@ -123,7 +123,7 @@ export default {
 									onOk() {
 											_this.clearData()
 											_this.fetchVideoList()
-											_this.$root.$emit('changeSelectedKeys')
+											_this.$root.$emit('changeSelectedKeys', data.keyPath)
 											_this.$destroyAll()
 									},
 									cancelText: '取消',
@@ -135,7 +135,7 @@ export default {
 							_this.clearData()
 							_this.fetchVideoList()
 							// 将数据再发回给side menu
-							_this.$root.$emit('changeSelectedKeys')
+							_this.$root.$emit('changeSelectedKeys', data.keyPath)
 					}
 			})
 			this.url = this.$store.state.server_url;
