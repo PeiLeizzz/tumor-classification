@@ -4,7 +4,7 @@
             <a-row type="flex" align="middle" justyfy="space-between">
                 <!--   图片列表   -->
                 <a-col :sm="5" :md="5" :lg="5" :xl="5" :xxl="5" style="display: flex;flex-flow: column;justify-content: center;align-items: center">
-                    <p align="end" style="margin: 0 0 0.5rem 0">当前已标记 {{ current_count }}/{{ received_data.video_id.length }}</p>
+                    <p align="end" style="margin: 0 0 0.5rem 0">当前已标记 {{ this.$store.state.current_count }}/{{ received_data.video_id.length }}</p>
                     <vue-scroll>
                         <div style="height: 550px;display:flex;align-items: center;flex-flow: column">
                             <div v-for="(item,index) in this.received_data.video_id" :key="item" style="width: 80%">
@@ -112,36 +112,37 @@ export default {
         }),
     },
     mounted() {
-        let _this = this
-        this.$root.$on('changeData', data => {
-            if (_this.current_count !== 0)
-                _this.$confirm({
-                    content: '检测到您有未上传的数据，现在切换页面会导致数据丢失。确定要切换吗？',
-                    okText: '确认',
-                    centered: true,
-                    onOk() {
-                        _this.clearData()
-                        _this.fetchVideoList()
-                        _this.$root.$emit('changeSelectedKeys')
-                        _this.$destroyAll()
-                    },
-                    cancelText: '取消',
-                    onCancel() {
-                        _this.$destroyAll()
-                    }
-                })
-            else {
-                _this.clearData()
-                _this.fetchVideoList()
-                // 将数据再发回给side menu
-                _this.$root.$emit('changeSelectedKeys')
-            }
-        })
-        this.url = this.$store.state.server_url;
-        this.fetchClasses();
-        this.fetchVideoList();
-        //设置起始时间
-        this.post_data.start_time = new Date().getTime();
+			let _this = this
+			this.$root.$on('changeDataOfVideo', data => {
+				console.log("on: changeDataOfVideo");
+					if (_this.$store.state.current_count !== 0)
+							_this.$confirm({
+									content: '检测到您有未上传的数据，现在切换页面会导致数据丢失。确定要切换吗？',
+									okText: '确认',
+									centered: true,
+									onOk() {
+											_this.clearData()
+											_this.fetchVideoList()
+											_this.$root.$emit('changeSelectedKeys')
+											_this.$destroyAll()
+									},
+									cancelText: '取消',
+									onCancel() {
+											_this.$destroyAll()
+									}
+							})
+					else {
+							_this.clearData()
+							_this.fetchVideoList()
+							// 将数据再发回给side menu
+							_this.$root.$emit('changeSelectedKeys')
+					}
+			})
+			this.url = this.$store.state.server_url;
+			this.fetchClasses();
+			this.fetchVideoList();
+			//设置起始时间
+			this.post_data.start_time = new Date().getTime();
     },
     data() {
         return {
@@ -164,7 +165,6 @@ export default {
                 end_time: "",
                 results: []
             },
-            current_count: 0,
             current_class: [],
             // 分类类别
             classes: [],
@@ -248,7 +248,7 @@ export default {
                 s_class: [],
                 is_classified: []
             }
-            this.current_count = 0
+						this.$store.commit('$_setCurrentCount', 0);
             this.current_class = []
             this.options.sources.src = [{
                 type: "video/mp4", // 类型
@@ -281,11 +281,13 @@ export default {
             }
 
             if (!this.received_data.is_classified[this.currentVideoIdx]) {
-                this.current_count++;
+                //this.current_count = 1;
+								this.$store.commit('$_setCurrentCount', 1)
                 this.$set(this.received_data.is_classified, this.currentVideoIdx, true)
             } else if (this.received_data.s_class[this.currentVideoIdx].length === 0) {
                 // 如果多选全都取消了，要重置状态
-                this.current_count--;
+                //this.current_count = 0;
+								this.$store.commit('$_setCurrentCount', 0)
                 this.$set(this.received_data.is_classified, this.currentVideoIdx, false)
             }
             this.refreshSelection()
@@ -301,7 +303,8 @@ export default {
                     title: '确定要切换吗',
                     content: '视频标注每次提交一个，如果切换视频，会导致当前视频的标注清空',
                     onOk() {
-                        _this.current_count--;
+                        //_this.current_count = 0;
+												_this.$store.commit('$_setCurrentCount', 0);
                         _this.received_data.is_classified[_this.currentVideoIdx] = false;
                         _this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
                         _this.currentVideoIdx = idx;
