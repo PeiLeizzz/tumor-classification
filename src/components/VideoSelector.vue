@@ -230,7 +230,7 @@ export default {
 										this.clearData();
 										this.fetchVideoList();
 										this.$message.success("上传成功")
-                }, 1000)
+                }, 500)
             }).catch((e) => {
 								this.upload_status = 2;
                 this.$message.error(e);

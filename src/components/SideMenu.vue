@@ -35,12 +35,13 @@ export default {
             batch_list: [],
 						video_list: [],
             rootSubmenuKeys: ['sub1', 'sub2'],
-            openKeys: ['sub1', 'sub2'],
+            openKeys: ['sub2'],
             keyPath: [],
         };
     },
     mounted() {
         this.fetchBatchList()
+				this.fetchVideoList()
         this.$root.$on('changeSelectedKeys', keyPath => {
 						console.log("keyPath", keyPath)
 						this.keyPath = keyPath;
@@ -61,7 +62,7 @@ export default {
         },
         changeData(data) {
             if (JSON.stringify(this.keyPath) != JSON.stringify(data.keyPath)) {
-                //this.keyPath = data.keyPath;
+                //this.keyPath = data.keyPath; 延迟更新
 								if (data.keyPath[1] === 'sub1') {
 									console.log("emit: changeDataOfImage");
 									this.$root.$emit('changeDataOfImage', data);
@@ -95,7 +96,9 @@ export default {
 				            this.$root.$emit('current_selection_branch', this.keyPath);
 				        }
 				    }).catch((e) => {
-				        this.$message.error(e);
+							this.keyPath = ['视频标注', 'sub2'];
+							this.$root.$emit('current_selection_branch', this.keyPath);
+				      this.$message.error(e);
 				    });
 				},
     },

@@ -46,8 +46,8 @@ export default {
     data() {
         return {
             collapsed: false,
-            current_selection: undefined,
-            current_content: "sub1"
+            current_selection: "视频标注",
+            current_content: "sub2"
         };
     },
     beforeDestroy() {
