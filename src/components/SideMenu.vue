@@ -66,10 +66,13 @@ export default {
 								if (data.keyPath[1] === 'sub1') {
 									console.log("emit: changeDataOfImage");
 									this.$root.$emit('changeDataOfImage', data);
+									this.$root.$emit("destroyTimer");
+									this.$root.$emit("startTimer");
 								}
 								else if (data.keyPath[1] === 'sub2') {
 									console.log("emit: changeDataOfVideo");
 									this.$root.$emit('changeDataOfVideo', data);
+									this.$root.$emit("destroyTimer");
 								}
             }
         },

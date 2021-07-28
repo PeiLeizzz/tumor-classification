@@ -136,7 +136,11 @@ export default {
         this.fetchClasses()
         this.fetchData()
         //设置起始时间
-        this.post_data.start_time = new Date().getTime();
+        //this.post_data.start_time = new Date().getTime();
+				this.$root.$emit("startTimer");
+				this.$root.$on("setTime", (time) => {
+					this.post_data.start_time = this.post_data.end_time - time;
+				})
     },
     data() {
         return {
@@ -205,7 +209,10 @@ export default {
         // 上传数据
         async postData() {
             // 填入完成时间戳
-            this.post_data.end_time = new Date().getTime()
+            this.post_data.end_time = new Date().getTime();
+						this.$root.$emit("getTime");
+						console.log("start", this.post_data.start_time);
+						console.log("end", this.post_data.end_time);
             await axios.post("/api/post_info", this.post_data).then((res) => {
                 this.uploading = false
                 this.upload_status = 1

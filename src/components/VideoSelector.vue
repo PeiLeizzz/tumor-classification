@@ -37,7 +37,7 @@
                     </a-row>
                     <a-row type="flex" justify="space-around" align="middle" v-viewer="{}">
                         <a-col style="width: 768px;height: 432px;display:flex;justify-content:center;align-content: center">
-													<video id="videoPlayer" class="my_video" controls>
+													<video id="videoPlayer" class="my_video" controls @play="playVideo" @pause="pauseVideo">
 														<source :src="videoUrl" type="video/mp4" />
 													</video>
                         </a-col>
@@ -136,7 +136,9 @@ export default {
 			this.fetchClasses();
 			this.fetchVideoList();
 			//设置起始时间
-			this.post_data.start_time = new Date().getTime();
+			this.$root.$on("setTime", (time) => {
+				this.post_data.start_time = this.post_data.end_time - time;
+			})
     },
     data() {
         return {
@@ -163,7 +165,7 @@ export default {
             // 分类类别
             classes: [],
             url: "",
-						videoUrl: ""
+						videoUrl: "",
         };
     },
     methods: {
@@ -193,7 +195,10 @@ export default {
         // 上传数据
         async postData() {
             // 填入完成时间戳
-            this.post_data.end_time = new Date().getTime()
+            this.post_data.end_time = new Date().getTime();
+						this.$root.$emit("getTime");
+						console.log("start", this.post_data.start_time);
+						console.log("end", this.post_data.end_time);
             await axios.post("/api/post_video_result", this.post_data).then((res) => {
 								this.upload_status = 1;
                 this.uploading = true;
@@ -227,13 +232,16 @@ export default {
 						this.videoUrl = "";
 						let video = document.getElementById("videoPlayer");
 						video.src = "";
+						this.$root.$emit("resetTimer");
+						this.$root.$emit("destroyTimer");
         },
         generatePostData() {
             this.$set(this.post_data, "video_name", this.received_data.video_id[this.currentVideoIdx]);
             this.$set(this.post_data, "results", this.received_data.s_class[this.currentVideoIdx]);
             this.postData();
 						this.modalVisible = false;
-						this.$root.$emit('resetTimer')
+						this.$root.$emit('resetTimer');
+						this.$root.$emit('pauseTimer');
         },
         // 将视频的isClassified置为false
         generateVideoClass() {
@@ -281,16 +289,18 @@ export default {
                         _this.received_data.is_classified[_this.currentVideoIdx] = false;
                         _this.received_data.s_class[_this.currentVideoIdx].splice(0, _this.received_data.s_class[_this.currentVideoIdx].length)
                         _this.currentVideoIdx = idx;
-                        _this.image_status = 1 // 切换为拉取模式
-                        _this.refreshSelection()
-												_this.$root.$emit('resetTimer')
+                        _this.image_status = 1; // 切换为拉取模式
+                        _this.refreshSelection();
+												_this.$root.$emit('resetTimer');
+												_this.$root.$emit('destroyTimer');
                     }
                 });
             } else {
                 this.currentVideoIdx = idx;
-                this.image_status = 1 // 切换为拉取模式
-                this.refreshSelection()
-								this.$root.$emit('resetTimer')
+                this.image_status = 1; // 切换为拉取模式
+                this.refreshSelection();
+								this.$root.$emit('resetTimer');
+								this.$root.$emit('destroyTimer');
             }
         },
         refreshSelection() {
@@ -318,6 +328,14 @@ export default {
 					video.src = this.received_data.video_url[id];
 					this.videoUrl = this.received_data.video_url[id];
         },
+				playVideo() {
+					console.log("playVideo");
+					this.$root.$emit("startTimer");
+				},
+				pauseVideo() {
+					console.log("pauseVideo");
+					this.$root.$emit("destroyTimer");
+				}
     },
     watch: {
         currentVideoIdx() {

@@ -35,24 +35,37 @@ export default {
         }
     },
     mounted() {
-        this.testTimer()
+        let _this = this;
+				this.$root.$on("startTimer", () => {
+					console.log("启动计时器");
+					this.testTimer();
+				})
         this.$root.$on("resetTimer", () => {
-            this.initTimer()
+          this.initTimer();
         })
+				this.$root.$on("destroyTimer", () => {
+					console.log("移除定时器");
+					if (_this.timer) {
+						clearInterval(_this.timer);
+					}
+				})
+				this.$root.$on("getTime", () => {
+					this.$root.$emit("setTime", this.currentTime * 1000);
+				})
     },
     beforeDestroy() {
         console.log('移除定时器')
         if (this.timer) {
-            clearInterval(this.timer)
+        	clearInterval(this.timer);
         }
     },
     methods: {
         initTimer() {
-            this.currentTime = 0
-            this.timeObj = null // 时间对象,下方会用到
-            this.myHours = '00' // 我定义来接收计算出来的 小时 的
-            this.myMinutes = '00' // 我定义来接收计算出来的 分钟 的
-            this.mySeconds = '00'// 我定义来接收计算出来的 秒钟 的
+					this.currentTime = 0
+					this.timeObj = null // 时间对象,下方会用到
+					this.myHours = '00' // 我定义来接收计算出来的 小时 的
+					this.myMinutes = '00' // 我定义来接收计算出来的 分钟 的
+					this.mySeconds = '00'// 我定义来接收计算出来的 秒钟 的
         },
         testTimer() {
             this.timeFunction();
@@ -60,6 +73,12 @@ export default {
                 this.timeFunction();
             }, 1000)
         },
+				destroyTimer() {
+					if (this.timer) {
+					  clearInterval(this.timer);
+					}
+					console.log("this.timer", this.timer);
+				},
         timeFunction() {
             // 开始执行倒计时
             this.timeObj = { // 时间对象
